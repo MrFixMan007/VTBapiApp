@@ -44,4 +44,28 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Optional -- Mockito framework
+    testImplementation ("org.mockito:mockito-core:5.5.0")
+
+    // Room
+    implementation ("androidx.room:room-runtime:2.5.2")
+    implementation ("androidx.room:room-ktx:2.5.2")
+
+    annotationProcessor ("androidx.room:room-compiler:2.5.2")
+
+    // optional - RxJava2 support for Room
+    implementation ("androidx.room:room-rxjava2:2.5.2")
+
+    // optional - RxJava3 support for Room
+    implementation ("androidx.room:room-rxjava3:2.5.2")
+
+    // optional - Guava support for Room, including Optional and ListenableFuture
+    implementation ("androidx.room:room-guava:2.5.2")
+
+    // optional - Test helpers
+    testImplementation ("androidx.room:room-testing:2.5.2")
+
+    // optional - Paging 3 Integration
+    implementation ("androidx.room:room-paging:2.5.2")
 }
