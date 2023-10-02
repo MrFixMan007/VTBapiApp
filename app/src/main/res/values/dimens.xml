@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="round">15dp</dimen>
+    <dimen name="marginTop">15dp</dimen>
+</resources>

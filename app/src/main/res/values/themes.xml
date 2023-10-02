@@ -2,8 +2,11 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.VTBapiApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+         <item name="colorPrimary">@color/elementsColor</item>
     </style>
+<!--    <style name="EditTextInput" parent="ThemeOverlay.Material3.TextInputEditText">-->
+<!--        <item name="colorPrimary">@color/black</item>-->
+<!--    </style>-->
 
     <style name="Theme.VTBapiApp" parent="Base.Theme.VTBapiApp" />
 </resources>
