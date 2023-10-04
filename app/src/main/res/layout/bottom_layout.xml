@@ -44,15 +44,27 @@
         app:layout_constraintStart_toStartOf="@+id/searchEditText"
         app:layout_constraintTop_toBottomOf="@+id/searchEditText" />
 
+    <ImageView
+        android:id="@+id/reklamaImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/button_filter"
+        app:layout_constraintTop_toBottomOf="@+id/button_filter"
+        android:layout_marginTop="@dimen/marginTop"
+        android:src="@drawable/reklama"
+        android:background="@color/primaryElementsColor"
+        android:paddingVertical="5dp"
+        />
+
     <TextView
         android:id="@+id/recentlySearchedTextView"
         style="@style/CustomPrimaryTextView."
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:layout_marginTop="@dimen/marginTop"
         android:text="@string/recently_searched"
         app:layout_constraintStart_toStartOf="@+id/button_filter"
-        app:layout_constraintTop_toBottomOf="@+id/button_filter" />
+        app:layout_constraintTop_toBottomOf="@+id/reklamaImageView"
+        android:layout_marginTop="@dimen/marginTop"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleView"

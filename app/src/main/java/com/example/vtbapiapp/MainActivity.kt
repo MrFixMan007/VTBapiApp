@@ -3,6 +3,7 @@ package com.example.vtbapiapp
 import android.os.Binder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -13,13 +14,13 @@ import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.example.vtbapiapp.databinding.ActivityMainBinding
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 
-class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
-    private val adapter = DepartmentHistoryAdapter()
+class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener {
+    private lateinit var binding: ActivityMainBinding
+    private val adapter = DepartmentHistoryAdapter(this)
     private val departmentList = listOf(
         DepartmentForHistory("Отделение ВТБ", "11-я Московская"),
         DepartmentForHistory("Банк ВТБ", "3-я Дачная")
-    )
+    )//TODO: динамическое заполнение
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,5 +43,14 @@ class MainActivity : AppCompatActivity() {
 //            adapter.addDepartment(DepartmentForHistory("Отделение ВТБ", "11-я Московская"))
             adapter.addDepartmentAll(departmentList)
         }
+    }
+
+    override fun onClickItem(department: DepartmentForHistory) {
+        Log.e("RcView", "нажат на $department")
+        //TODO: подставка
+    }
+
+    override fun onClickDeleteItem(department: DepartmentForHistory) {
+        adapter.deleteDepartment(department)
     }
 }

@@ -6,13 +6,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.vtbapiapp.databinding.HistoryDepartmentItemBinding
 
-class DepartmentHistoryAdapter : RecyclerView.Adapter<DepartmentHistoryAdapter.DepartmentHolder>() {
+class DepartmentHistoryAdapter(val listener: Listener) : RecyclerView.Adapter<DepartmentHistoryAdapter.DepartmentHolder>() {
     val departmentList = ArrayList<DepartmentForHistory>()
     class DepartmentHolder(item: View) : RecyclerView.ViewHolder(item) {
         val binding = HistoryDepartmentItemBinding.bind(item)
-        fun bind(department: DepartmentForHistory) = with(binding){
-            textView.text = department.address
-            textView2.text = department.name
+        fun bind(department: DepartmentForHistory, listener: Listener) = with(binding){
+            addressDepartmentTextView.text = department.address
+            nameDepartmentTextView.text = department.name
+            itemView.setOnClickListener {
+                listener.onClickItem(department)
+            }
+            deleteImageButton.setOnClickListener {
+                listener.onClickDeleteItem(department)
+            }
         }
     }
 
@@ -26,7 +32,8 @@ class DepartmentHistoryAdapter : RecyclerView.Adapter<DepartmentHistoryAdapter.D
     }
 
     override fun onBindViewHolder(holder: DepartmentHolder, position: Int) {
-        holder.bind(departmentList[position])
+        holder.bind(departmentList[position], listener)
+
     }
 
     fun addDepartment(department: DepartmentForHistory){
@@ -39,8 +46,18 @@ class DepartmentHistoryAdapter : RecyclerView.Adapter<DepartmentHistoryAdapter.D
         notifyDataSetChanged()
     }
 
-    fun deleteDepartment(position: Int){
+    fun deleteDepartmentOnPosition(position: Int){
         departmentList.remove(departmentList.get(position))
         notifyDataSetChanged()
+    }
+
+    fun deleteDepartment(department: DepartmentForHistory){
+        departmentList.remove(department)
+        notifyDataSetChanged()
+    }
+
+    interface Listener{
+        fun onClickItem(department: DepartmentForHistory)
+        fun onClickDeleteItem(department: DepartmentForHistory)
     }
 }
