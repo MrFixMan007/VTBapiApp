@@ -1,4 +1,5 @@
 <resources>
     <dimen name="round">15dp</dimen>
     <dimen name="marginTop">15dp</dimen>
+    <dimen name="history_department_item_margin">10dp</dimen>
 </resources>

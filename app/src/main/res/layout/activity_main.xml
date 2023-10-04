@@ -19,6 +19,7 @@
         android:text="Main Content"
         android:textSize="16sp" />
 
-    <include layout="@layout/bottom_layout"></include>
+    <include layout="@layout/bottom_layout"
+        android:id="@+id/includedLayout" />
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>
