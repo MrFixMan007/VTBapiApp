@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">VTBapiApp</string>
+    <string name="title_activity_adapter" translatable="false">adapterActivity</string>
     <string name="search">Поиск</string>
-    <string name="title_activity_adapter">adapterActivity</string>
+    <string name="recently_searched">Недавно искали</string>
+    <string name="favourites">Избранное</string>
 </resources>

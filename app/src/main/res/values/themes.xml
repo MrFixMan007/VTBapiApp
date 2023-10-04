@@ -7,12 +7,15 @@
     <style name="CustomEditText." parent="Widget.AppCompat.EditText">
         <item name="android:textColor">@color/secondaryElementsColor</item>
         <item name="android:textColorHint">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t2</item>
     </style>
     <style name="CustomPrimaryTextView." parent="Widget.AppCompat.TextView">
         <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">@dimen/t1</item>
     </style>
     <style name="CustomSecondaryTextView." parent="Widget.AppCompat.TextView">
         <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t3</item>
     </style>
     <!--    <style name="EditTextInput" parent="ThemeOverlay.Material3.TextInputEditText">-->
     <!--        <item name="colorPrimary">@color/black</item>-->

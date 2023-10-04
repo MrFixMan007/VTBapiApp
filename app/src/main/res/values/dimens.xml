@@ -2,4 +2,8 @@
     <dimen name="round">15dp</dimen>
     <dimen name="marginTop">15dp</dimen>
     <dimen name="history_department_item_margin">10dp</dimen>
+    <dimen name="t1">20dp</dimen>
+    <dimen name="t2">15dp</dimen>
+    <dimen name="t3">12dp</dimen>
+    <dimen name="t4">10dp</dimen>
 </resources>

@@ -8,6 +8,7 @@
 
     <EditText
         style="@style/CustomEditText."
+        android:inputType="text"
         android:id="@+id/searchEditText"
         android:layout_width="0dp"
         android:layout_height="50dp"
@@ -43,6 +44,16 @@
         app:layout_constraintStart_toStartOf="@+id/searchEditText"
         app:layout_constraintTop_toBottomOf="@+id/searchEditText" />
 
+    <TextView
+        android:id="@+id/recentlySearchedTextView"
+        style="@style/CustomPrimaryTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_marginTop="@dimen/marginTop"
+        android:text="@string/recently_searched"
+        app:layout_constraintStart_toStartOf="@+id/button_filter"
+        app:layout_constraintTop_toBottomOf="@+id/button_filter" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleView"
         android:layout_width="0dp"
@@ -50,6 +61,16 @@
         android:layout_marginTop="@dimen/marginTop"
         app:layout_constraintEnd_toEndOf="@+id/button_more"
         app:layout_constraintStart_toStartOf="@+id/searchEditText"
-        app:layout_constraintTop_toBottomOf="@+id/button_filter" />
+        app:layout_constraintTop_toBottomOf="@+id/recentlySearchedTextView" />
+
+    <TextView
+        android:id="@+id/favourites"
+        style="@style/CustomPrimaryTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_marginTop="@dimen/marginTop"
+        android:text="@string/favourites"
+        app:layout_constraintStart_toStartOf="@+id/button_filter"
+        app:layout_constraintTop_toBottomOf="@+id/recycleView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
