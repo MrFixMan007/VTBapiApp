@@ -4,41 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor">
+    android:background="@color/backgroundColor"
+    >
 
     <EditText
-        style="@style/CustomEditText."
-        android:inputType="text"
         android:id="@+id/searchEditText"
+        style="@style/CustomEditText."
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:layout_marginTop="@dimen/marginTop"
+        android:layout_marginLeft="@dimen/marginLeftRight"
+        android:layout_marginRight="@dimen/marginLeftRight"
         android:background="@drawable/rounded_edittext"
         android:hint="@string/search"
+        android:inputType="text"
         android:padding="15dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/moreButton"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.03"
-        app:layout_constraintWidth_percent="0.8" />
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
     <ImageButton
-        android:id="@+id/button_more"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:id="@+id/moreButton"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:layout_marginTop="@dimen/marginTop"
+        android:layout_marginRight="@dimen/marginLeftRight"
         android:background="@drawable/rounded_button"
         android:src="@drawable/more"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.7"
-        app:layout_constraintStart_toEndOf="@+id/searchEditText"
-        app:layout_constraintTop_toTopOf="@+id/searchEditText" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/button_filter"
+        android:id="@+id/filterButton"
         android:src="@drawable/filter"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
         android:layout_marginTop="@dimen/marginTop"
         android:background="@drawable/rounded_button"
         app:layout_constraintStart_toStartOf="@+id/searchEditText"
@@ -48,8 +49,8 @@
         android:id="@+id/reklamaImageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/button_filter"
-        app:layout_constraintTop_toBottomOf="@+id/button_filter"
+        app:layout_constraintStart_toStartOf="@+id/filterButton"
+        app:layout_constraintTop_toBottomOf="@+id/filterButton"
         android:layout_marginTop="@dimen/marginTop"
         android:src="@drawable/reklama"
         android:background="@color/primaryElementsColor"
@@ -62,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="25dp"
         android:text="@string/recently_searched"
-        app:layout_constraintStart_toStartOf="@+id/button_filter"
+        app:layout_constraintStart_toStartOf="@+id/filterButton"
         app:layout_constraintTop_toBottomOf="@+id/reklamaImageView"
         android:layout_marginTop="@dimen/marginTop"/>
 
@@ -71,18 +72,20 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginTop"
-        app:layout_constraintEnd_toEndOf="@+id/button_more"
+        app:layout_constraintEnd_toEndOf="@+id/moreButton"
         app:layout_constraintStart_toStartOf="@+id/searchEditText"
-        app:layout_constraintTop_toBottomOf="@+id/recentlySearchedTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/recentlySearchedTextView"
+        android:nestedScrollingEnabled="true"
+        />
 
     <TextView
-        android:id="@+id/favourites"
+        android:id="@+id/favouritesTextView"
         style="@style/CustomPrimaryTextView."
         android:layout_width="wrap_content"
         android:layout_height="25dp"
         android:layout_marginTop="@dimen/marginTop"
         android:text="@string/favourites"
-        app:layout_constraintStart_toStartOf="@+id/button_filter"
+        app:layout_constraintStart_toStartOf="@+id/filterButton"
         app:layout_constraintTop_toBottomOf="@+id/recycleView" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -90,8 +93,33 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginTop"
-        app:layout_constraintEnd_toEndOf="@+id/button_more"
+        app:layout_constraintEnd_toEndOf="@+id/moreButton"
         app:layout_constraintStart_toStartOf="@+id/searchEditText"
-        app:layout_constraintTop_toBottomOf="@+id/favourites" />
+        app:layout_constraintTop_toBottomOf="@+id/favouritesTextView" />
+
+<!--    Показывает когда пишется текст в поисковик -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchedRecycleViewWhenSearch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/moreButton"
+        app:layout_constraintStart_toStartOf="@+id/searchEditText"
+        app:layout_constraintTop_toTopOf="@+id/filterButton"
+        android:visibility="invisible"
+        android:nestedScrollingEnabled="true"
+        />
+
+    <ImageButton
+        android:id="@+id/filterButtonWhenSearch"
+        android:src="@drawable/filter"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintStart_toStartOf="@+id/moreButton"
+        app:layout_constraintTop_toTopOf="@+id/moreButton"
+        android:visibility="invisible"/>
+
+    <!--    Показывает когда пишется текст в поисковик -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
