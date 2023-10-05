@@ -13,7 +13,15 @@
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="android:textSize">@dimen/t1</item>
     </style>
-    <style name="CustomSecondaryTextView." parent="Widget.AppCompat.TextView">
+    <style name="CustomT3TextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t3</item>
+    </style>
+    <style name="CustomT2TextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t2</item>
+    </style>
+    <style name="CustomT4TextView." parent="Widget.AppCompat.TextView">
         <item name="android:textColor">@color/secondaryElementsColor</item>
         <item name="android:textSize">@dimen/t3</item>
     </style>
