@@ -14,12 +14,17 @@ import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.example.vtbapiapp.databinding.ActivityMainBinding
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 
-class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener {
+class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener {
     private lateinit var binding: ActivityMainBinding
     private val adapter = DepartmentHistoryAdapter(this)
+    private val adapterFavorite = DepartmentFavoriteAdapter(this)
     private val departmentList = listOf(
         DepartmentForHistory("Отделение ВТБ", "11-я Московская"),
         DepartmentForHistory("Банк ВТБ", "3-я Дачная")
+    )//TODO: динамическое заполнение
+    private val departmentFavoiriteList = listOf(
+        DepartmentFavorite("ВТБ", "1-я Ленинская"),
+        DepartmentFavorite("Банк ВТБ", "2-й проспект Строителей")
     )//TODO: динамическое заполнение
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +45,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener {
         binding.apply {
             includedLayout.recycleView.layoutManager = LinearLayoutManager(this@MainActivity)
             includedLayout.recycleView.adapter = adapter
-//            adapter.addDepartment(DepartmentForHistory("Отделение ВТБ", "11-я Московская"))
             adapter.addDepartmentAll(departmentList)
+
+            includedLayout.favouritesRecycleView.layoutManager = LinearLayoutManager(this@MainActivity)
+            includedLayout.favouritesRecycleView.adapter = adapterFavorite
+            adapterFavorite.addDepartmentAll(departmentFavoiriteList)
         }
     }
 
@@ -52,5 +60,14 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener {
 
     override fun onClickDeleteItem(department: DepartmentForHistory) {
         adapter.deleteDepartment(department)
+    }
+
+    override fun onClickItem(department: DepartmentFavorite) {
+        Log.e("RcView", "нажат на $department")
+        //TODO: подставка
+    }
+
+    override fun onClickDeleteItem(department: DepartmentFavorite) {
+        adapterFavorite.deleteDepartment(department)
     }
 }
