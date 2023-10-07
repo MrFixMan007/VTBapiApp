@@ -2,14 +2,12 @@ package com.example.vtbapiapp
 
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.slideIn
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,12 +32,13 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var filterButton: ImageButton
     private lateinit var reklamaImageView: ImageView
     private lateinit var recentlySearchedTextView: TextView
-    private lateinit var recycleView: RecyclerView
+    private lateinit var recentlySearchedRecycleView: RecyclerView
     private lateinit var favouritesTextView: TextView
     private lateinit var favouritesRecycleView: RecyclerView
     private lateinit var searchedRecycleView: RecyclerView
     private lateinit var filterButtonWhenSearch: ImageButton
 
+    private lateinit var customScrollView: CustomScrollView
 
     private val departmentList = listOf(
         DepartmentForHistory("Отделение ВТБ", "11-я Московская"),
@@ -86,14 +85,17 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             includedLayout.searchedRecycleViewWhenSearch.layoutManager = LinearLayoutManager(this@MainActivity)
             includedLayout.searchedRecycleViewWhenSearch.adapter = adapterSearched
             adapterSearched.addDepartmentAll(departmentSearchList)
+            includedLayout.searchedRecycleViewWhenSearch.isNestedScrollingEnabled = false
 
-            includedLayout.recycleView.layoutManager = LinearLayoutManager(this@MainActivity)
-            includedLayout.recycleView.adapter = adapter
+            includedLayout.recentlySearchedRecycleView.layoutManager = LinearLayoutManager(this@MainActivity)
+            includedLayout.recentlySearchedRecycleView.adapter = adapter
             adapter.addDepartmentAll(departmentList)
+            includedLayout.recentlySearchedRecycleView.isNestedScrollingEnabled = false
 
             includedLayout.favouritesRecycleView.layoutManager = LinearLayoutManager(this@MainActivity)
             includedLayout.favouritesRecycleView.adapter = adapterFavorite
             adapterFavorite.addDepartmentAll(departmentFavoiriteList)
+            includedLayout.favouritesRecycleView.isNestedScrollingEnabled = false
         }
     }
 
@@ -109,7 +111,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         slidingUpLayout.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
 
             override fun onPanelSlide(panel: View, slideOffset: Float) {
-                if (slideOffset > 0.7) //TODO: неполное развёртывание
+//              //TODO: неполное развёртывание
                 Log.i("Slide", "onPanelSlide, offset $slideOffset")
             }
 
@@ -118,13 +120,17 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 previousState: SlidingUpPanelLayout.PanelState?,
                 newState: SlidingUpPanelLayout.PanelState
             ) {
-                Log.i("State", "onPanelStateChanged $newState")
-            }
-        })
-        slidingUpLayout.setFadeOnClickListener(object : View.OnClickListener {
-            override fun onClick(view: View?) {
-//              slidingUpLayout.setPanelState(PanelState.COLLAPSED)
-                Log.i("Click", "clicked")
+                if(newState.equals(SlidingUpPanelLayout.PanelState.EXPANDED)) {
+                    customScrollView.setScrollingEnabled(true)
+                    Log.i("Раскрыто", "панель раскрыта, теперь customScrollView.isEnabled = ${customScrollView.isEnabled} \n" +
+                            "и slidingUpLayout.isTouchEnabled = ${slidingUpLayout.isTouchEnabled}")
+                }
+                else {
+                    customScrollView.setScrollingEnabled(false)
+                    Log.i("Закрыто", "панель закрыта, теперь customScrollView.isEnabled = ${customScrollView.isEnabled} \n" +
+                            "и slidingUpLayout.isTouchEnabled = ${slidingUpLayout.isTouchEnabled}")
+                }
+                Log.i("Состояние", "Состояние поменялось с $previousState на $newState")
             }
         })
     }
@@ -136,11 +142,23 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         filterButton = findViewById(R.id.filterButton)
         reklamaImageView = findViewById(R.id.reklamaImageView)
         recentlySearchedTextView = findViewById(R.id.recentlySearchedTextView)
-        recycleView = findViewById(R.id.recycleView)
+        recentlySearchedRecycleView = findViewById(R.id.recentlySearchedRecycleView)
         favouritesTextView = findViewById(R.id.favouritesTextView)
         favouritesRecycleView = findViewById(R.id.favouritesRecycleView)
         searchedRecycleView = findViewById(R.id.searchedRecycleViewWhenSearch)
         filterButtonWhenSearch = findViewById(R.id.filterButtonWhenSearch)
+
+        customScrollView = findViewById(R.id.scrollView)
+        customScrollView.setScrollingEnabled(false)
+
+        customScrollView.setOnScrollChangeListener(View.OnScrollChangeListener { view, i, i1, i2, i3 ->
+            if(i1 > i3) slidingUpLayout.isTouchEnabled = false
+            if(!(view.canScrollVertically(-1)) && i1 == 0) {
+                slidingUpLayout.isTouchEnabled = true
+            }
+            Log.e("canScrollVertically?", "${view.canScrollVertically(-1)}")
+            Log.i("скролинг", "i = $i,  i1 = $i1,  i2 = $i2,  i3 = $i3")
+        })
 
         var text: String
         searchEditText.addTextChangedListener {
@@ -154,7 +172,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 filterButton.visibility = View.VISIBLE
                 reklamaImageView.visibility = View.VISIBLE
                 recentlySearchedTextView.visibility = View.VISIBLE
-                recycleView.visibility = View.VISIBLE
+                recentlySearchedRecycleView.visibility = View.VISIBLE
                 favouritesTextView.visibility = View.VISIBLE
                 favouritesRecycleView.visibility = View.VISIBLE
             }
@@ -167,7 +185,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 filterButton.visibility = View.INVISIBLE
                 reklamaImageView.visibility = View.INVISIBLE
                 recentlySearchedTextView.visibility = View.INVISIBLE
-                recycleView.visibility = View.INVISIBLE
+                recentlySearchedRecycleView.visibility = View.INVISIBLE
                 favouritesTextView.visibility = View.INVISIBLE
                 favouritesRecycleView.visibility = View.INVISIBLE
             }
