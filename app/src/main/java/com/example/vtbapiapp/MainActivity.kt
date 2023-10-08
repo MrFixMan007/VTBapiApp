@@ -1,13 +1,16 @@
 package com.example.vtbapiapp
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -92,10 +95,20 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             adapter.addDepartmentAll(departmentList)
             includedLayout.recentlySearchedRecycleView.isNestedScrollingEnabled = false
 
+//            val incl: ViewGroup = findViewById(R.id.includedLayout) //TODO: ля удобства все дочерние элементы находить так и делать невидимыми в цикле
+//            Log.i("child", "${incl.getChildAt(7).accessibilityClassName}")
+
             includedLayout.favouritesRecycleView.layoutManager = LinearLayoutManager(this@MainActivity)
             includedLayout.favouritesRecycleView.adapter = adapterFavorite
             adapterFavorite.addDepartmentAll(departmentFavoiriteList)
             includedLayout.favouritesRecycleView.isNestedScrollingEnabled = false
+
+//            val layoutParams: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
+//                ConstraintLayout.LayoutParams.WRAP_CONTENT, // Ширина кнопки
+//                ConstraintLayout.LayoutParams.WRAP_CONTENT  // Высота кнопки
+//            )
+//            layoutParams.topToBottom = R.id.includedLayout
+//            //TODO: кнопки над SlidingUpPanel
         }
     }
 
@@ -111,7 +124,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         slidingUpLayout.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
 
             override fun onPanelSlide(panel: View, slideOffset: Float) {
-//              //TODO: неполное развёртывание
+                //TODO: неполное развёртывание
                 Log.i("Slide", "onPanelSlide, offset $slideOffset")
             }
 
@@ -165,8 +178,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             text = searchEditText.text.toString()
             if (text == "" && searches){
                 searches = false
-                filterButtonWhenSearch.visibility = View.INVISIBLE
-                searchedRecycleView.visibility = View.INVISIBLE
+                filterButtonWhenSearch.visibility = View.GONE
+                searchedRecycleView.visibility = View.GONE
 
                 moreButton.visibility = View.VISIBLE
                 filterButton.visibility = View.VISIBLE
@@ -181,13 +194,13 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 filterButtonWhenSearch.visibility = View.VISIBLE
                 searchedRecycleView.visibility = View.VISIBLE
 
-                moreButton.visibility = View.INVISIBLE
-                filterButton.visibility = View.INVISIBLE
-                reklamaImageView.visibility = View.INVISIBLE
-                recentlySearchedTextView.visibility = View.INVISIBLE
-                recentlySearchedRecycleView.visibility = View.INVISIBLE
-                favouritesTextView.visibility = View.INVISIBLE
-                favouritesRecycleView.visibility = View.INVISIBLE
+                moreButton.visibility = View.GONE
+                filterButton.visibility = View.GONE
+                reklamaImageView.visibility = View.GONE
+                recentlySearchedTextView.visibility = View.GONE
+                recentlySearchedRecycleView.visibility = View.GONE
+                favouritesTextView.visibility = View.GONE
+                favouritesRecycleView.visibility = View.GONE
             }
         }
         moreButton.setOnClickListener {
