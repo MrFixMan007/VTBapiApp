@@ -24,6 +24,16 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
+    <ImageView
+        android:id="@+id/lineImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/line_ico"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
         android:id="@+id/moreButton"
         android:layout_width="@dimen/heightOfSearchEditText"
@@ -31,13 +41,13 @@
         android:layout_marginTop="@dimen/marginTop"
         android:layout_marginRight="@dimen/marginLeftRight"
         android:background="@drawable/rounded_button"
-        android:src="@drawable/more"
+        android:src="@drawable/more_ico"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/filterButton"
-        android:src="@drawable/filter"
+        android:src="@drawable/filter_ico"
         android:layout_width="@dimen/heightOfSearchEditText"
         android:layout_height="@dimen/heightOfSearchEditText"
         android:layout_marginTop="@dimen/marginTop"
@@ -107,13 +117,13 @@
         app:layout_constraintEnd_toEndOf="@+id/moreButton"
         app:layout_constraintStart_toStartOf="@+id/searchEditText"
         app:layout_constraintTop_toTopOf="@+id/filterButton"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:nestedScrollingEnabled="true"
         />
 
     <ImageButton
         android:id="@+id/filterButtonWhenSearch"
-        android:src="@drawable/filter"
+        android:src="@drawable/filter_ico"
         android:layout_width="@dimen/heightOfSearchEditText"
         android:layout_height="@dimen/heightOfSearchEditText"
         android:background="@drawable/rounded_button"
@@ -122,5 +132,12 @@
         android:visibility="invisible"/>
 
     <!--    Показывает когда пишется текст в поисковик -->
+
+    <include
+        android:id="@+id/departmentInfoIncludedLayout"
+        layout="@layout/department_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

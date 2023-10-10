@@ -8,4 +8,20 @@
     <dimen name="t2">15dp</dimen>
     <dimen name="t3">12dp</dimen>
     <dimen name="t4">10dp</dimen>
-</resources>
+    <dimen name="largeSize">25dp</dimen>
+
+    <dimen name="departmentInfoMarginLeftRight">20dp</dimen>
+    <dimen name="departmentInfoClasterMarginTop">10dp</dimen>
+    <dimen name="departmentInfoDateMarginTop">5dp</dimen>
+    <dimen name="departmentInfoStarMarginRight">6dp</dimen>
+
+    <dimen name="departmentInfoConstantsHeight">30dp</dimen>
+    <dimen name="departmentInfoTitleHeight">35dp</dimen>
+    <dimen name="departmentInfoDateHeight">20dp</dimen>
+    <dimen name="departmentInfoPictureHeight">100dp</dimen>
+    <dimen name="departmentInfoMarginTitleTopLeft">6dp</dimen>
+    <dimen name="departmentInfoTitleMarginTop">10dp</dimen>
+    <dimen name="departmentInfoContentUnderTitleMarginTop">12dp</dimen>
+    <dimen name="departmentInfoButonsPanelMarginTop">30dp</dimen>
+
+    </resources>

@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/history_department_item_margin"
-                android:src="@drawable/time" />
+                android:src="@drawable/time_ico" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -68,7 +68,7 @@
             android:background="@drawable/rounded_button"
             android:layout_gravity="center_vertical|right"
             android:layout_marginRight="@dimen/history_department_item_margin"
-            android:src="@drawable/cross" />
+            android:src="@drawable/cross_ico" />
 
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

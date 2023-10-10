@@ -25,6 +25,14 @@
         <item name="android:textColor">@color/secondaryElementsColor</item>
         <item name="android:textSize">@dimen/t3</item>
     </style>
+    <style name="CustomDepartmentInfoConstantTextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">18dp</item>
+    </style>
+    <style name="CustomDepartmentInfoDataTextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t3</item>
+    </style>
     <!--    <style name="EditTextInput" parent="ThemeOverlay.Material3.TextInputEditText">-->
     <!--        <item name="colorPrimary">@color/black</item>-->
     <!--    </style>-->

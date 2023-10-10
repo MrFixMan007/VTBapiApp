@@ -4,4 +4,9 @@
     <string name="search">Поиск</string>
     <string name="recently_searched">Недавно искали</string>
     <string name="favourites">Избранное</string>
+    <string name="address">Адрес</string>
+    <string name="contacts">Контакты</string>
+    <string name="working_hours">Время работы</string>
+    <string name="work_shedule">График работы</string>
+    <string name="load">Загруженность</string>
 </resources>

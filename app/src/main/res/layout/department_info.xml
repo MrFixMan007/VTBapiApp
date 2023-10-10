@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    android:id="@+id/departmentInfOLayout">
+
+
+    <ImageView
+        android:id="@+id/departmentInfoReklamaImageView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/departmentInfoPictureHeight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/department_info_reklama" />
+
+    <TextView
+        android:id="@+id/departmentNameTextView"
+        style="@style/CustomPrimaryTextView."
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoTitleHeight"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        android:layout_marginTop="@dimen/departmentInfoTitleMarginTop"
+        android:textSize="@dimen/largeSize"
+        android:text="Название"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/departmentInfoReklamaImageView" />
+
+    <ImageButton
+        android:id="@+id/cancelDepartmentInfoImageButton"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:background="@drawable/rounded_button"
+        android:src="@drawable/cross_ico"
+        android:layout_marginRight="@dimen/departmentInfoMarginLeftRight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/departmentNameTextView" />
+
+    <ImageView
+        android:id="@+id/starImageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/departmentInfoTitleMarginTop"
+        android:layout_marginRight="@dimen/departmentInfoMarginLeftRight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cancelDepartmentInfoImageButton"
+        app:srcCompat="@drawable/star_not_colored_ico" />
+
+    <ImageView
+        android:id="@+id/starImageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/departmentInfoStarMarginRight"
+        app:layout_constraintEnd_toStartOf="@+id/starImageView1"
+        app:layout_constraintTop_toTopOf="@+id/starImageView1"
+        app:srcCompat="@drawable/star_colored_ico" />
+    <ImageView
+        android:id="@+id/starImageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/departmentInfoStarMarginRight"
+        app:layout_constraintEnd_toStartOf="@+id/starImageView2"
+        app:layout_constraintTop_toTopOf="@+id/starImageView1"
+        app:srcCompat="@drawable/star_colored_ico" />
+    <ImageView
+        android:id="@+id/starImageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/departmentInfoStarMarginRight"
+        app:layout_constraintEnd_toStartOf="@+id/starImageView3"
+        app:layout_constraintTop_toTopOf="@+id/starImageView1"
+        app:srcCompat="@drawable/star_colored_ico" />
+    <ImageView
+        android:id="@+id/starImageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/departmentInfoStarMarginRight"
+        app:layout_constraintEnd_toStartOf="@+id/starImageView4"
+        app:layout_constraintTop_toTopOf="@+id/starImageView1"
+        app:srcCompat="@drawable/star_colored_ico" />
+
+    <TextView
+        android:id="@+id/countsOfCommentsTextView"
+        style="@style/CustomDepartmentInfoDataTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoDateHeight"
+        android:layout_marginTop="@dimen/departmentInfoDateMarginTop"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="@+id/starImageView1"
+        app:layout_constraintStart_toStartOf="@+id/starImageView5"
+        app:layout_constraintTop_toBottomOf="@+id/starImageView1"
+        tools:ignore="TextSizeCheck" />
+
+    <TextView
+        android:id="@+id/addressConstTextView"
+        style="@style/CustomDepartmentInfoConstantTextView."
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_height="@dimen/departmentInfoConstantsHeight"
+        android:text="@string/address"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        android:layout_marginTop="@dimen/departmentInfoContentUnderTitleMarginTop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/departmentNameTextView" />
+
+    <TextView
+        android:id="@+id/addressDataTextView"
+        style="@style/CustomDepartmentInfoDataTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoDateHeight"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        android:layout_marginTop="@dimen/departmentInfoDateMarginTop"
+        android:gravity="center"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addressConstTextView"
+        tools:ignore="TextSizeCheck" />
+
+    <TextView
+        android:id="@+id/contactsConstTextView"
+        style="@style/CustomDepartmentInfoConstantTextView."
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_height="@dimen/departmentInfoConstantsHeight"
+        android:text="@string/contacts"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        android:layout_marginTop="@dimen/departmentInfoClasterMarginTop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addressDataTextView" />
+
+    <TextView
+        android:id="@+id/contactsDataTextView"
+        style="@style/CustomDepartmentInfoDataTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoDateHeight"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        android:layout_marginTop="@dimen/departmentInfoDateMarginTop"
+        android:gravity="center"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contactsConstTextView"
+        tools:ignore="TextSizeCheck" />
+
+    <ImageButton
+        android:id="@+id/telegrammImageButton"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        android:layout_marginTop="@dimen/departmentInfoClasterMarginTop"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contactsDataTextView"
+        app:srcCompat="@drawable/telegramm_ico"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/okImageButton"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:layout_marginLeft="15dp"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintStart_toEndOf="@+id/telegrammImageButton"
+        app:layout_constraintTop_toTopOf="@+id/telegrammImageButton"
+        app:srcCompat="@drawable/ok_ico"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/vkImageButton"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:layout_marginLeft="15dp"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintStart_toEndOf="@+id/okImageButton"
+        app:layout_constraintTop_toTopOf="@+id/okImageButton"
+        app:srcCompat="@drawable/vk_ico"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/workTimesConsttextView"
+        style="@style/CustomDepartmentInfoConstantTextView."
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_height="@dimen/departmentInfoConstantsHeight"
+        android:layout_marginTop="@dimen/departmentInfoClasterMarginTop"
+        android:text="@string/working_hours"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        app:layout_constraintTop_toBottomOf="@+id/telegrammImageButton" />
+
+    <TextView
+        android:id="@+id/workTimesDataTextView"
+        style="@style/CustomDepartmentInfoDataTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoDateHeight"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        android:layout_marginTop="@dimen/departmentInfoDateMarginTop"
+        android:gravity="center"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/workTimesConsttextView"
+        tools:ignore="TextSizeCheck" />
+
+    <TextView
+        android:id="@+id/loadConstTextView"
+        style="@style/CustomDepartmentInfoConstantTextView."
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_height="@dimen/departmentInfoConstantsHeight"
+        android:layout_marginTop="@dimen/departmentInfoClasterMarginTop"
+        android:text="@string/load"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        app:layout_constraintTop_toBottomOf="@+id/workTimesDataTextView" />
+
+    <TextView
+        android:id="@+id/loadDataTextView"
+        style="@style/CustomDepartmentInfoDataTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoDateHeight"
+        android:layout_marginLeft="@dimen/departmentInfoMarginLeftRight"
+        android:layout_marginTop="@dimen/departmentInfoDateMarginTop"
+        android:gravity="center"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loadConstTextView"
+        tools:ignore="TextSizeCheck" />
+
+    <ImageView
+        android:id="@+id/workSheduleImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arrow_to_down_ico"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="@dimen/departmentInfoMarginLeftRight"
+        app:layout_constraintTop_toTopOf="@+id/workTimesConsttextView"
+        android:layout_marginTop="15dp"
+        />
+
+    <TextView
+        android:id="@+id/workSheduleTextView"
+        style="@style/CustomDepartmentInfoDataTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoDateHeight"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="1dp"
+        android:gravity="center"
+        android:text="@string/work_shedule"
+        app:layout_constraintBottom_toBottomOf="@+id/workSheduleImageView"
+        app:layout_constraintEnd_toStartOf="@+id/workSheduleImageView"
+        app:layout_constraintTop_toTopOf="@+id/workSheduleImageView"
+        tools:ignore="TextSizeCheck" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/departmentInfoButonsPanelMarginTop"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loadDataTextView">
+
+        <ImageButton
+            android:id="@+id/routeImageButton"
+            android:layout_width="80dp"
+            android:layout_height="@dimen/heightOfSearchEditText"
+            android:background="@drawable/rounded_action_button"
+            android:src="@drawable/route_ico"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ImageButton
+            android:id="@+id/favouriteImageButton"
+            android:layout_width="@dimen/heightOfSearchEditText"
+            android:layout_height="@dimen/heightOfSearchEditText"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/rounded_button"
+            android:src="@drawable/favourite_ico"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ImageButton
+            android:id="@+id/phoneImageButton"
+            android:layout_width="@dimen/heightOfSearchEditText"
+            android:layout_height="@dimen/heightOfSearchEditText"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/rounded_button"
+            android:src="@drawable/phone_ico"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ImageButton
+            android:id="@+id/wwwImageButton"
+            android:layout_width="@dimen/heightOfSearchEditText"
+            android:layout_height="@dimen/heightOfSearchEditText"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/rounded_button"
+            android:src="@drawable/www_ico"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ImageButton
+            android:id="@+id/shareImageButton"
+            android:layout_width="@dimen/heightOfSearchEditText"
+            android:layout_height="@dimen/heightOfSearchEditText"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/rounded_button"
+            android:src="@drawable/share_arrow_ico"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ImageButton
+            android:id="@+id/goImageButton"
+            android:layout_width="@dimen/heightOfSearchEditText"
+            android:layout_height="@dimen/heightOfSearchEditText"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/rounded_button"
+            android:src="@drawable/go_arrow_ico"
+            tools:ignore="SpeakableTextPresentCheck" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

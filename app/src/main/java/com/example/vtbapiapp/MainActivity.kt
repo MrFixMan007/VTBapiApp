@@ -1,6 +1,5 @@
 package com.example.vtbapiapp
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -22,7 +21,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var binding: ActivityMainBinding
 
     private var searches: Boolean = false
-    private var slidingUpPanelAnchor: Float = 0.5F
+    private var slidingUpPanelStartAnchor: Float = 0.5F
+    private var slidingUpPanelDepartmentInfoAnchor: Float = 0F //считается на OnCreate
 
     private val adapter = DepartmentHistoryAdapter(this)
     private val adapterFavorite = DepartmentFavoriteAdapter(this)
@@ -41,7 +41,44 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var searchedRecycleView: RecyclerView
     private lateinit var filterButtonWhenSearch: ImageButton
 
+    private lateinit var departmentInfoIncludedLayout: ViewGroup
+
     private lateinit var customScrollView: CustomScrollView
+
+    private var startSlidingUpPanelHeight: Int = 0 //считается на OnCreate
+    private var departmentInfoSlidingUpPanelHeight: Int = 0 //считается на OnCreate
+
+    private var appHeightPixels = 0
+    private var appWidthPixels = 0
+
+    private lateinit var departmentInfoReklamaImageView: ImageView
+    private lateinit var departmentNameTextView:TextView
+    private lateinit var cancelDepartmentInfoImageButton: ImageButton
+    private lateinit var starImageView1: ImageView
+    private lateinit var starImageView2: ImageView
+    private lateinit var starImageView3: ImageView
+    private lateinit var starImageView4: ImageView
+    private lateinit var starImageView5: ImageView
+    private lateinit var countsOfCommentsTextView: TextView
+    private lateinit var addressConstTextView: TextView
+    private lateinit var addressDataTextView: TextView
+    private lateinit var contactsConstTextView: TextView
+    private lateinit var contactsDataTextView: TextView
+    private lateinit var telegrammImageButton: ImageButton
+    private lateinit var okImageButton: ImageButton
+    private lateinit var vkImageButton: ImageButton
+    private lateinit var workTimesConsttextView: TextView
+    private lateinit var workTimesDataTextView: TextView
+    private lateinit var workSheduleImageView: ImageView
+    private lateinit var workSheduleTextView: TextView
+    private lateinit var routeImageButton: ImageButton
+    private lateinit var favouriteImageButton: ImageButton
+    private lateinit var phoneImageButton: ImageButton
+    private lateinit var wwwImageButton: ImageButton
+    private lateinit var shareImageButton: ImageButton
+    private lateinit var goImageButton: ImageButton
+    private lateinit var loadConstTextView: TextView
+    private lateinit var loadDataTextView: TextView
 
     private val departmentList = listOf(
         DepartmentForHistory("Отделение ВТБ", "11-я Московская"),
@@ -95,9 +132,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             adapter.addDepartmentAll(departmentList)
             includedLayout.recentlySearchedRecycleView.isNestedScrollingEnabled = false
 
-//            val incl: ViewGroup = findViewById(R.id.includedLayout) //TODO: ля удобства все дочерние элементы находить так и делать невидимыми в цикле
-//            Log.i("child", "${incl.getChildAt(7).accessibilityClassName}")
-
             includedLayout.favouritesRecycleView.layoutManager = LinearLayoutManager(this@MainActivity)
             includedLayout.favouritesRecycleView.adapter = adapterFavorite
             adapterFavorite.addDepartmentAll(departmentFavoiriteList)
@@ -115,11 +149,17 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private fun initSlidingUpPanel(){
         slidingUpLayout = findViewById(R.id.slidingUpLayout)
 
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+        Log.e("Размеры экрана", "screenWidth = $screenWidth, screenHeight = $screenHeight")
+
         val res = resources
         val pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) + (res.getDimension(R.dimen.marginTop) * 2)).toInt()
         slidingUpLayout.panelHeight = pixelValue // Динамичная высота под любой экран
+        startSlidingUpPanelHeight = pixelValue
 
-        slidingUpLayout.anchorPoint = slidingUpPanelAnchor
+        slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
         slidingUpLayout.coveredFadeColor = resources.getColor(R.color.transparent)
         slidingUpLayout.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
 
@@ -149,6 +189,33 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     private fun initOther(){
+        findViewById<ImageView>(R.id.lineImageView).setOnClickListener{
+            if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.ANCHORED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
+        else slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
+
+        val res = resources
+        var pixelValue = (res.getDimension(R.dimen.departmentInfoPictureHeight) + res.getDimension(R.dimen.departmentInfoTitleMarginTop)
+                + res.getDimension(R.dimen.departmentInfoTitleHeight) + res.getDimension(R.dimen.departmentInfoContentUnderTitleMarginTop)
+                + res.getDimension(R.dimen.departmentInfoConstantsHeight) + res.getDimension(R.dimen.departmentInfoDateMarginTop)
+                + res.getDimension(R.dimen.departmentInfoDateHeight)).toInt()
+        departmentInfoSlidingUpPanelHeight = pixelValue
+
+        pixelValue = (res.getDimension(R.dimen.departmentInfoPictureHeight) + res.getDimension(R.dimen.departmentInfoTitleMarginTop)
+                + res.getDimension(R.dimen.departmentInfoTitleHeight) + res.getDimension(R.dimen.departmentInfoContentUnderTitleMarginTop)
+                + (res.getDimension(R.dimen.departmentInfoConstantsHeight) * 4) + (res.getDimension(R.dimen.departmentInfoDateMarginTop) * 4)
+                + (res.getDimension(R.dimen.departmentInfoDateHeight) * 4) + (res.getDimension(R.dimen.departmentInfoClasterMarginTop) * 4)
+                + (res.getDimension(R.dimen.heightOfSearchEditText) * 3)
+                + res.getDimension(R.dimen.departmentInfoButonsPanelMarginTop)
+                ).toInt()
+
+        Log.e("pixelValue", "$pixelValue")
+
+        slidingUpPanelDepartmentInfoAnchor = pixelValue.toFloat()
+
+        val displayMetrics = resources.displayMetrics
+        appWidthPixels = displayMetrics.widthPixels
+        appHeightPixels = displayMetrics.heightPixels
+
         searchEditText = findViewById(R.id.searchEditText)
 
         moreButton = findViewById(R.id.moreButton)
@@ -175,9 +242,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
         var text: String
         searchEditText.addTextChangedListener {
+            if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.ANCHORED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
             text = searchEditText.text.toString()
             if (text == "" && searches){
                 searches = false
+
                 filterButtonWhenSearch.visibility = View.GONE
                 searchedRecycleView.visibility = View.GONE
 
@@ -207,10 +276,46 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             Log.e("RcView", "нажат на ${slidingUpLayout.panelState}")
             //TODO: выдвижение настроек
         }
+
+        departmentInfoIncludedLayout = findViewById(R.id.departmentInfoIncludedLayout)
+
+        departmentInfoReklamaImageView = findViewById(R.id.departmentInfoReklamaImageView)
+        departmentNameTextView  = findViewById(R.id.departmentNameTextView )
+        cancelDepartmentInfoImageButton = findViewById(R.id.cancelDepartmentInfoImageButton)
+        starImageView1 = findViewById(R.id.starImageView1)
+        starImageView2 = findViewById(R.id.starImageView2)
+        starImageView3 = findViewById(R.id.starImageView3)
+        starImageView4 = findViewById(R.id.starImageView4)
+        starImageView5 = findViewById(R.id.starImageView5)
+        countsOfCommentsTextView = findViewById(R.id.countsOfCommentsTextView)
+        addressConstTextView = findViewById(R.id.addressConstTextView)
+        addressDataTextView = findViewById(R.id.addressDataTextView)
+        contactsConstTextView = findViewById(R.id.contactsConstTextView)
+        contactsDataTextView = findViewById(R.id.contactsDataTextView)
+        telegrammImageButton = findViewById(R.id.telegrammImageButton)
+        okImageButton = findViewById(R.id.okImageButton)
+        vkImageButton = findViewById(R.id.vkImageButton)
+        workTimesConsttextView = findViewById(R.id.workTimesConsttextView)
+        workTimesDataTextView = findViewById(R.id.workTimesDataTextView)
+        workSheduleImageView = findViewById(R.id.workSheduleImageView)
+        workSheduleTextView = findViewById(R.id.workSheduleTextView)
+        routeImageButton = findViewById(R.id.routeImageButton)
+        favouriteImageButton = findViewById(R.id.favouriteImageButton)
+        phoneImageButton = findViewById(R.id.phoneImageButton)
+        wwwImageButton = findViewById(R.id.wwwImageButton)
+        shareImageButton = findViewById(R.id.shareImageButton)
+        goImageButton = findViewById(R.id.goImageButton)
+        loadConstTextView = findViewById(R.id.loadConstTextView)
+        loadDataTextView = findViewById(R.id.loadDataTextView)
+
+        cancelDepartmentInfoImageButton.setOnClickListener { setMainLayout() }
     }
 
     override fun onClickItem(department: DepartmentForHistory) {
         Log.e("RcView", "нажат на $department")
+        departmentNameTextView.text = department.name
+        addressDataTextView.text = department.address
+        setDepartmentLayout()
         //TODO: подставка
     }
 
@@ -220,6 +325,9 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     override fun onClickItem(department: DepartmentFavorite) {
         Log.e("RcView", "нажат на $department")
+        departmentNameTextView.text = department.name
+        addressDataTextView.text = department.address
+        setDepartmentLayout()
         //TODO: подставка
     }
 
@@ -229,10 +337,62 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     override fun onClickItem(department: Department) {
         Log.e("RcView", "нажат на $department")
+        departmentNameTextView.text = department.name
+        addressDataTextView.text = department.address
+        loadDataTextView.text = department.load.toString()
+        contactsDataTextView.text = department.phone
+        workTimesDataTextView.text = department.workTime
+        setDepartmentLayout()
         //TODO: подставка
     }
 
     override fun onClickDeleteItem(department: Department) {
         TODO("Not yet implemented")
+    }
+
+    private fun setDepartmentLayout(){
+        searchEditText.visibility = View.INVISIBLE
+        filterButtonWhenSearch.visibility = View.INVISIBLE
+        searchedRecycleView.visibility = View.GONE
+
+        moreButton.visibility = View.INVISIBLE
+        filterButton.visibility = View.INVISIBLE
+        reklamaImageView.visibility = View.INVISIBLE
+        recentlySearchedTextView.visibility = View.INVISIBLE
+        recentlySearchedRecycleView.visibility = View.GONE
+        favouritesTextView.visibility = View.INVISIBLE
+        favouritesRecycleView.visibility = View.GONE
+
+        departmentInfoIncludedLayout.visibility = View.VISIBLE
+
+        // параметры для высоты и ширины
+        val layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+            appHeightPixels // Высота в пикселях или другой единице измерения
+        )
+        departmentInfoIncludedLayout.layoutParams = layoutParams
+        slidingUpLayout.panelHeight = departmentInfoSlidingUpPanelHeight
+        slidingUpLayout.anchorPoint = slidingUpPanelDepartmentInfoAnchor
+    }
+
+    private fun setMainLayout(){
+        departmentInfoIncludedLayout.visibility = View.GONE
+        searchEditText.visibility = View.VISIBLE
+        if(searches){
+            filterButtonWhenSearch.visibility = View.VISIBLE
+            searchedRecycleView.visibility = View.VISIBLE
+        }
+        else{
+            moreButton.visibility = View.VISIBLE
+            filterButton.visibility = View.VISIBLE
+            reklamaImageView.visibility = View.VISIBLE
+            recentlySearchedTextView.visibility = View.VISIBLE
+            recentlySearchedRecycleView.visibility = View.VISIBLE
+            favouritesTextView.visibility = View.VISIBLE
+            favouritesRecycleView.visibility = View.VISIBLE
+        }
+
+        slidingUpLayout.panelHeight = startSlidingUpPanelHeight
+        slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
     }
 }
