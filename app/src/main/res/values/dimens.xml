@@ -24,4 +24,6 @@
     <dimen name="departmentInfoContentUnderTitleMarginTop">12dp</dimen>
     <dimen name="departmentInfoButonsPanelMarginTop">30dp</dimen>
 
+    <dimen name="routeTitleMarginTop">15dp</dimen>
+
     </resources>

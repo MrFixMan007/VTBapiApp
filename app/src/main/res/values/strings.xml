@@ -9,4 +9,8 @@
     <string name="working_hours">Время работы</string>
     <string name="work_shedule">График работы</string>
     <string name="load">Загруженность</string>
+    <string name="route">Маршрут</string>
+    <string name="cancel">Сбросить</string>
+    <string name="myLocation">Моё местоположение</string>
+    <string name="go">Поехали</string>
 </resources>

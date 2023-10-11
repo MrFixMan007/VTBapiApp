@@ -9,4 +9,8 @@
     <string name="working_hours">Working hours</string>
     <string name="work_shedule">Work shedule</string>
     <string name="load">Load</string>
+    <string name="route">Route</string>
+    <string name="cancel">Cancel</string>
+    <string name="myLocation">My location</string>
+    <string name="go">Go</string>
 </resources>
