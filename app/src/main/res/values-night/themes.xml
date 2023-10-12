@@ -1,7 +1,42 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
     <!-- Base application theme. -->
     <style name="Base.Theme.VTBapiApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/primaryElementsColor</item>
+    </style>
+    <style name="CustomEditText." parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textColorHint">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t2</item>
+    </style>
+    <style name="CustomPrimaryTextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">@dimen/t1</item>
+    </style>
+    <style name="CustomT3TextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t3</item>
+    </style>
+    <style name="CustomT2TextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t2</item>
+    </style>
+    <style name="CustomT4TextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t3</item>
+    </style>
+    <style name="CustomDepartmentInfoConstantTextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">18dp</item>
+    </style>
+    <style name="CustomDepartmentInfoDataTextView." parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/secondaryElementsColor</item>
+        <item name="android:textSize">@dimen/t3</item>
+    </style>
+    <style name="CustomActionButton" parent="Widget.AppCompat.Button">
+        <item name="backgroundTint">@color/specialActionElementsColor</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">@dimen/t1</item>
     </style>
 </resources>
