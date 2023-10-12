@@ -14,6 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.vtbapiapp.databinding.ActivityMainBinding
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.mapview.MapView
 
 
 class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener {
@@ -101,9 +106,19 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
         Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
         )//TODO: динамическое заполнение
+
+    private lateinit var mapView : MapView
+    private lateinit var map: Map
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        MapKitFactory.setApiKey("1d2e8d46-8a93-4908-9d08-55f914630072")
+        MapKitFactory.initialize(this)
+
         setContentView(R.layout.activity_main)
+        mapView = findViewById(R.id.mapview)
+        map = mapView.mapWindow.map
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.slidingUpLayout)
@@ -111,9 +126,16 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         initSlidingUpPanel()
         initAdapters()
         initOther()
+
+        map.move(
+            CameraPosition(
+                Point(55.751225, 37.629540),
+                /* zoom = */ 17.0f,
+                /* azimuth = */ 150.0f,
+                /* tilt = */ 30.0f
+            )
+        )
     }
-
-
 
     private fun initAdapters(){
         binding.apply {
@@ -331,6 +353,18 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 //            setDepartmentLayout()
 //        }
         routeImageButton.setOnClickListener { setRoute() }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+        mapView.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MapKitFactory.getInstance().onStop()
+        mapView.onStop()
     }
 
     override fun onClickItem(department: DepartmentForHistory) {
