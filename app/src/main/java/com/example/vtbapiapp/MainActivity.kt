@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,7 +30,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     private lateinit var slidingUpLayout : SlidingUpPanelLayout
 
-    private lateinit var searchEditText: EditText
+    private lateinit var addressFromEditText: EditText
     private lateinit var moreButton: ImageButton
     private lateinit var filterButton: ImageButton
     private lateinit var reklamaImageView: ImageView
@@ -40,8 +38,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var recentlySearchedRecycleView: RecyclerView
     private lateinit var favouritesTextView: TextView
     private lateinit var favouritesRecycleView: RecyclerView
-    private lateinit var searchedRecycleView: RecyclerView
-    private lateinit var filterButtonWhenSearch: ImageButton
+    private lateinit var searchedRecycleViewWhenSearch: RecyclerView
+//    private lateinit var filterButtonWhenSearch: ImageButton
 
     private lateinit var departmentInfoIncludedLayout: ViewGroup
 
@@ -83,12 +81,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var loadConstTextView: TextView
     private lateinit var loadDataTextView: TextView
 
-    private lateinit var routeIncludedLayout: ViewGroup
-    private lateinit var cancelConstantTextView: TextView
-    private lateinit var addressFromEditText: EditText
+//    private lateinit var routeIncludedLayout: ViewGroup
+//    private lateinit var cancelConstantTextView: TextView
+//    private lateinit var addressFromEditText: EditText
     private lateinit var addressToEditText: EditText
-    private lateinit var cancelRouteImageButton: ImageButton
-    private lateinit var goButton: Button
+//    private lateinit var cancelRouteImageButton: ImageButton
+//    private lateinit var goButton: Button
 
 
     private val departmentList = listOf(
@@ -97,27 +95,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     )//TODO: динамическое заполнение
     private val departmentFavoiriteList = listOf(
         DepartmentFavorite("ВТБ", "1-я Ленинская"),
-        DepartmentFavorite("Банк ВТБ", "2-й проспект Строителей"),
-        DepartmentFavorite("ВТБ", "1-я Ленинская"),
-        DepartmentFavorite("Банк ВТБ", "2-й проспект Строителей"),
-        DepartmentFavorite("ВТБ", "1-я Ленинская"),
-        DepartmentFavorite("Банк ВТБ", "2-й проспект Строителей"),
-        DepartmentFavorite("ВТБ", "1-я Ленинская"),
-        DepartmentFavorite("Банк ВТБ", "2-й проспект Строителей"),
-        DepartmentFavorite("ВТБ", "1-я Ленинская"),
-        DepartmentFavorite("Банк ВТБ", "2-й проспект Строителей"),
-        DepartmentFavorite("ВТБ", "1-я Ленинская"),
-        DepartmentFavorite("Банк ВТБ", "2-й проспект Строителей"),
     )//TODO: динамическое заполнение
     private val departmentSearchList = listOf(
         Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
-        Department("Банк ВТБ", "1-я Ленина", 110, 50, "+78854689754", "12-19"),
         Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
-        Department("Банк ВТБ", "1-я Ленина", 110, 50, "+78854689754", "12-19"),
         Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
-        Department("Банк ВТБ", "1-я Ленина", 110, 50, "+78854689754", "12-19"),
-        Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
-
         )//TODO: динамическое заполнение
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,6 +112,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         initAdapters()
         initOther()
     }
+
+
 
     private fun initAdapters(){
         binding.apply {
@@ -166,7 +150,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         Log.e("Размеры экрана", "screenWidth = $screenWidth, screenHeight = $screenHeight")
 
         val res = resources
-        val pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) + (res.getDimension(R.dimen.marginTop) * 2)).toInt()
+        val pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) * 2 + res.getDimension(R.dimen.marginTop) * 3).toInt()
         slidingUpLayout.panelHeight = pixelValue // Динамичная высота под любой экран
         startSlidingUpPanelHeight = pixelValue
 
@@ -229,18 +213,18 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
         Log.e("slidingUpPanelDepartmentInfoAnchor", "$slidingUpPanelDepartmentInfoAnchor")
 
-        pixelValue = (res.getDimension(R.dimen.departmentInfoTitleHeight) + res.getDimension(R.dimen.routeTitleMarginTop)
-                + res.getDimension(R.dimen.heightOfSearchEditText) * 3 + res.getDimension(R.dimen.marginTop)
+        pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) * 2
                 ).toInt()
 
         slidingUpPanelRouteAnchor = pixelValue.toFloat()/appHeightPixels
 
-        pixelValue = (res.getDimension(R.dimen.departmentInfoTitleHeight) + res.getDimension(R.dimen.routeTitleMarginTop)
+        pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) * 2 + res.getDimension(R.dimen.marginTop) * 3
                 ).toInt()
 
         routeSlidingUpPanelHeight = pixelValue
 
-        searchEditText = findViewById(R.id.searchEditText)
+        addressFromEditText = findViewById(R.id.addressFromEditText)
+        addressToEditText = findViewById(R.id.addressToEditText)
 
         moreButton = findViewById(R.id.moreButton)
         filterButton = findViewById(R.id.filterButton)
@@ -249,8 +233,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         recentlySearchedRecycleView = findViewById(R.id.recentlySearchedRecycleView)
         favouritesTextView = findViewById(R.id.favouritesTextView)
         favouritesRecycleView = findViewById(R.id.favouritesRecycleView)
-        searchedRecycleView = findViewById(R.id.searchedRecycleViewWhenSearch)
-        filterButtonWhenSearch = findViewById(R.id.filterButtonWhenSearch)
+        searchedRecycleViewWhenSearch = findViewById(R.id.searchedRecycleViewWhenSearch)
+//        filterButtonWhenSearch = findViewById(R.id.filterButtonWhenSearch)
 
         customScrollView = findViewById(R.id.scrollView)
         customScrollView.setScrollingEnabled(false)
@@ -265,17 +249,18 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         })
 
         var text: String
-        searchEditText.addTextChangedListener {
-            if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.ANCHORED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
-            text = searchEditText.text.toString()
+        addressToEditText.addTextChangedListener {
+            if(slidingUpLayout.anchorPoint == slidingUpPanelRouteAnchor) slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
+            if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.EXPANDED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
+            text = addressToEditText.text.toString()
             if (text == "" && searches){
                 searches = false
 
-                filterButtonWhenSearch.visibility = View.GONE
-                searchedRecycleView.visibility = View.GONE
+//                filterButtonWhenSearch.visibility = View.GONE
+                searchedRecycleViewWhenSearch.visibility = View.GONE
 
-                moreButton.visibility = View.VISIBLE
-                filterButton.visibility = View.VISIBLE
+//                moreButton.visibility = View.VISIBLE
+//                filterButton.visibility = View.VISIBLE
                 reklamaImageView.visibility = View.VISIBLE
                 recentlySearchedTextView.visibility = View.VISIBLE
                 recentlySearchedRecycleView.visibility = View.VISIBLE
@@ -284,17 +269,20 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             }
             else if (text != "" && !searches){
                 searches = true
-                filterButtonWhenSearch.visibility = View.VISIBLE
-                searchedRecycleView.visibility = View.VISIBLE
+//                filterButtonWhenSearch.visibility = View.VISIBLE
+                searchedRecycleViewWhenSearch.visibility = View.VISIBLE
 
-                moreButton.visibility = View.GONE
-                filterButton.visibility = View.GONE
+//                moreButton.visibility = View.GONE
+//                filterButton.visibility = View.GONE
                 reklamaImageView.visibility = View.GONE
                 recentlySearchedTextView.visibility = View.GONE
                 recentlySearchedRecycleView.visibility = View.GONE
                 favouritesTextView.visibility = View.GONE
                 favouritesRecycleView.visibility = View.GONE
             }
+        }
+        addressFromEditText.addTextChangedListener {
+            if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.EXPANDED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
         }
         moreButton.setOnClickListener {
             Log.e("RcView", "нажат на ${slidingUpLayout.panelState}")
@@ -332,19 +320,17 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         loadConstTextView = findViewById(R.id.loadConstTextView)
         loadDataTextView = findViewById(R.id.loadDataTextView)
 
-        routeIncludedLayout = findViewById(R.id.routeIncludedLayout)
-        cancelConstantTextView = findViewById(R.id.cancelConstantTextView)
-        addressFromEditText = findViewById(R.id.addressFromEditText)
-        addressToEditText = findViewById(R.id.addressToEditText)
-        cancelRouteImageButton = findViewById(R.id.cancelRouteImageButton)
-        goButton = findViewById(R.id.goButton)
+//        routeIncludedLayout = findViewById(R.id.routeIncludedLayout)
+//        cancelConstantTextView = findViewById(R.id.cancelConstantTextView)
+//        cancelRouteImageButton = findViewById(R.id.cancelRouteImageButton)
+//        goButton = findViewById(R.id.goButton)
 
         cancelDepartmentInfoImageButton.setOnClickListener { setMainLayout() }
-        cancelRouteImageButton.setOnClickListener {
-            routeIncludedLayout.visibility = View.GONE
-            setDepartmentLayout()
-        }
-        routeImageButton.setOnClickListener { setRouteLayout() }
+//        cancelRouteImageButton.setOnClickListener {
+//            routeIncludedLayout.visibility = View.GONE
+//            setDepartmentLayout()
+//        }
+        routeImageButton.setOnClickListener { setRoute() }
     }
 
     override fun onClickItem(department: DepartmentForHistory) {
@@ -387,9 +373,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     private fun setDepartmentLayout(){
-        searchEditText.visibility = View.INVISIBLE
-        filterButtonWhenSearch.visibility = View.INVISIBLE
-        searchedRecycleView.visibility = View.GONE
+        addressFromEditText.visibility = View.INVISIBLE
+        addressToEditText.visibility = View.INVISIBLE
+
+//        filterButtonWhenSearch.visibility = View.INVISIBLE
+        searchedRecycleViewWhenSearch.visibility = View.GONE
 
         moreButton.visibility = View.INVISIBLE
         filterButton.visibility = View.INVISIBLE
@@ -402,11 +390,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         departmentInfoIncludedLayout.visibility = View.VISIBLE
 
         // параметры для высоты и ширины
-        val layoutParams = ConstraintLayout.LayoutParams(
-            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
-            appHeightPixels // Высота в пикселях или другой единице измерения
-        )
-        departmentInfoIncludedLayout.layoutParams = layoutParams
+//        val layoutParams = ConstraintLayout.LayoutParams(
+//            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+//            appHeightPixels // Высота в пикселях или другой единице измерения
+//        )
+//        departmentInfoIncludedLayout.layoutParams = layoutParams
         slidingUpLayout.panelHeight = departmentInfoSlidingUpPanelHeight
         slidingUpLayout.anchorPoint = slidingUpPanelDepartmentInfoAnchor
 
@@ -418,14 +406,15 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     private fun setMainLayout(){
         departmentInfoIncludedLayout.visibility = View.GONE
-        searchEditText.visibility = View.VISIBLE
+        addressFromEditText.visibility = View.VISIBLE
+        addressToEditText.visibility = View.VISIBLE
+        moreButton.visibility = View.VISIBLE
+        filterButton.visibility = View.VISIBLE
         if(searches){
-            filterButtonWhenSearch.visibility = View.VISIBLE
-            searchedRecycleView.visibility = View.VISIBLE
+//            filterButtonWhenSearch.visibility = View.VISIBLE
+            searchedRecycleViewWhenSearch.visibility = View.VISIBLE
         }
         else{
-            moreButton.visibility = View.VISIBLE
-            filterButton.visibility = View.VISIBLE
             reklamaImageView.visibility = View.VISIBLE
             recentlySearchedTextView.visibility = View.VISIBLE
             recentlySearchedRecycleView.visibility = View.VISIBLE
@@ -436,20 +425,21 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         slidingUpLayout.panelHeight = startSlidingUpPanelHeight
         slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
 
-        Log.e("Anchoe", "${slidingUpLayout.anchorPoint}")
-        Log.e("Anchoe", "${slidingUpLayout.panelHeight}")
+        Log.e("Anchor", "${slidingUpLayout.anchorPoint}")
+        Log.e("Anchor", "${slidingUpLayout.panelHeight}")
     }
 
-    private fun setRouteLayout(){
+    private fun setRoute(){
         departmentInfoIncludedLayout.visibility = View.GONE
-        routeIncludedLayout.visibility = View.VISIBLE
+        addressFromEditText.visibility = View.VISIBLE
+        addressToEditText.visibility = View.VISIBLE
+        moreButton.visibility = View.VISIBLE
+        filterButton.visibility = View.VISIBLE
 
-        // параметры для высоты и ширины
-        val layoutParams = ConstraintLayout.LayoutParams(
-            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
-            appHeightPixels // Высота в пикселях или другой единице измерения
-        )
-        routeIncludedLayout.layoutParams = layoutParams
+        addressToEditText.setText(departmentNameTextView.text)
+        searchedRecycleViewWhenSearch.visibility = View.INVISIBLE
+        searches = false
+
         slidingUpLayout.panelHeight = routeSlidingUpPanelHeight
         slidingUpLayout.anchorPoint = slidingUpPanelRouteAnchor
 
