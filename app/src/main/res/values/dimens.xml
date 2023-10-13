@@ -1,7 +1,7 @@
 <resources>
     <dimen name="round">15dp</dimen>
     <dimen name="marginTop">15dp</dimen>
-    <dimen name="marginLeftRight">8dp</dimen>
+    <dimen name="marginLeftRight">20dp</dimen>
     <dimen name="heightOfSearchEditText">50dp</dimen>
     <dimen name="history_department_item_margin">10dp</dimen>
     <dimen name="t1">20dp</dimen>

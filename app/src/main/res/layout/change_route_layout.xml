@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/backgroundColor">
+
+    <TextView
+        android:id="@+id/routeConstantTextView"
+        style="@style/CustomPrimaryTextView."
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoTitleHeight"
+        android:textSize="@dimen/largeSize"
+        android:text="@string/route"
+        android:layout_marginTop="@dimen/routeTitleMarginTop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/cancelConstantTextView"
+        style="@style/CustomDepartmentInfoDataTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/departmentInfoTitleHeight"
+        android:layout_marginRight="@dimen/departmentInfoMarginLeftRight"
+        android:gravity="center"
+        android:text="@string/cancel"
+        android:textColor="@color/specialActionElementsColor"
+        android:textSize="@dimen/t2"
+        app:layout_constraintBottom_toBottomOf="@+id/routeConstantTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/routeConstantTextView"
+        />
+
+    <ImageView
+        android:id="@+id/lineRouteImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/line_ico"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/routeConstantTextView"/>
+
+    <EditText
+        android:id="@+id/addressFromEditText"
+        style="@style/CustomEditText."
+        android:layout_width="0dp"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:layout_marginTop="@dimen/marginTop"
+        android:layout_marginLeft="@dimen/marginLeftRight"
+        android:layout_marginRight="@dimen/marginLeftRight"
+        android:background="@drawable/rounded_edittext"
+        android:textSize="18dp"
+        android:text="@string/myLocation"
+        android:inputType="text"
+        android:gravity="center_vertical"
+        android:paddingLeft="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/routeConstantTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <EditText
+        android:id="@+id/addressToChangeRouteEditText"
+        style="@style/CustomEditText."
+        android:layout_width="0dp"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:layout_marginTop="@dimen/marginTop"
+        android:layout_marginLeft="@dimen/marginLeftRight"
+        android:layout_marginRight="@dimen/marginLeftRight"
+        android:background="@drawable/rounded_edittext"
+        android:textSize="18dp"
+        android:inputType="text"
+        android:gravity="center_vertical"
+        android:paddingLeft="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addressFromEditText"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/addressFromEditText"
+        app:layout_constraintStart_toStartOf="@+id/addressFromEditText"
+        app:layout_constraintBottom_toBottomOf="@+id/addressFromEditText"
+        android:src="@drawable/small_circle1_ico"
+        android:layout_marginLeft="8dp"
+        />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/addressToChangeRouteEditText"
+        app:layout_constraintStart_toStartOf="@+id/addressToChangeRouteEditText"
+        app:layout_constraintBottom_toBottomOf="@+id/addressToChangeRouteEditText"
+        android:src="@drawable/small_circle2_ico"
+        android:layout_marginLeft="8dp"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
