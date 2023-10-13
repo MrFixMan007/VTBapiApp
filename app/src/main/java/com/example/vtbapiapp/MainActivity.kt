@@ -1,5 +1,11 @@
 package com.example.vtbapiapp
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,17 +14,35 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.vtbapiapp.databinding.ActivityMainBinding
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.RequestPoint
+import com.yandex.mapkit.RequestPointType
+import com.yandex.mapkit.directions.DirectionsFactory
+import com.yandex.mapkit.directions.driving.DrivingOptions
+import com.yandex.mapkit.directions.driving.DrivingRoute
+import com.yandex.mapkit.directions.driving.DrivingRouter
+import com.yandex.mapkit.directions.driving.DrivingSession
+import com.yandex.mapkit.directions.driving.VehicleOptions
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.IconStyle
+import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObjectCollection
+import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.Error
+import com.yandex.runtime.image.ImageProvider
+import com.yandex.runtime.network.NetworkError
 
 
 class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener {
@@ -107,8 +131,52 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
         )//TODO: динамическое заполнение
 
-    private lateinit var mapView : MapView
+    // Код для карт _____________________________________________
+    private lateinit var mapView: MapView
     private lateinit var map: Map
+    private lateinit var locationManager: LocationManager
+    private val PERMISSIONS_REQUEST_FINE_LOCATION = 1
+
+    private val inputListener = object : InputListener {
+        override fun onMapTap(map: Map, point: Point) = Unit
+
+        override fun onMapLongTap(map: Map, point: Point) {
+            routePoints = routePoints + point
+        }
+    }
+
+    private val drivingRouteListener = object : DrivingSession.DrivingRouteListener {
+        override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
+            routes = drivingRoutes
+        }
+
+        override fun onDrivingRoutesError(error: Error) {
+            val errorMessage = when (error) {
+                is NetworkError -> "Routes request error due to network issues"
+                else -> "Routes request unknown error"
+            }
+            Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private var routePoints = emptyList<Point>()
+        set(value) {
+            field = value
+            onRoutePointsUpdated()
+        }
+
+    private var routes = emptyList<DrivingRoute>()
+        set(value) {
+            field = value
+            onRoutesUpdated()
+        }
+
+    private lateinit var drivingRouter: DrivingRouter
+    private var drivingSession: DrivingSession? = null
+    private lateinit var placemarksCollection: MapObjectCollection
+    private lateinit var routesCollection: MapObjectCollection
+
+    //_____________________________________________
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,8 +185,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         MapKitFactory.initialize(this)
 
         setContentView(R.layout.activity_main)
-        mapView = findViewById(R.id.mapview)
-        map = mapView.mapWindow.map
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.slidingUpLayout)
@@ -127,14 +193,28 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         initAdapters()
         initOther()
 
-        map.move(
-            CameraPosition(
-                Point(55.751225, 37.629540),
-                /* zoom = */ 17.0f,
-                /* azimuth = */ 150.0f,
-                /* tilt = */ 30.0f
-            )
-        )
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        // Проверяем разрешение на доступ к местоположению
+        if (checkLocationPermission()) {
+            // Если разрешение есть, запрашиваем местоположение пользователя
+            requestLocation()
+        } else {
+            // Если разрешение отсутствует, запрашиваем его
+            requestLocationPermission()
+        }
+
+        mapView = findViewById(R.id.mapview)
+        map = mapView.mapWindow.map
+        map.addInputListener(inputListener)
+
+        // Создаем коллекции для маркеров и маршрутов на карте
+        placemarksCollection = map.mapObjects.addCollection()
+        routesCollection = map.mapObjects.addCollection()
+
+        // Инициализируем DrivingRouter для построения маршрутов
+        drivingRouter = DirectionsFactory.getInstance().createDrivingRouter()
+
     }
 
     private fun initAdapters(){
@@ -404,6 +484,160 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     override fun onClickDeleteItem(department: Department) {
         TODO("Not yet implemented")
+    }
+
+    private fun checkLocationPermission() =
+        ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestLocationPermission() =
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            PERMISSIONS_REQUEST_FINE_LOCATION
+        )
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            PERMISSIONS_REQUEST_FINE_LOCATION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Разрешение на доступ к местоположению получено, запросите местоположение пользователя
+                    requestLocation()
+                } else {
+                    // Разрешение не получено, обработайте это по вашему усмотрению (например, показ сообщения)
+                }
+            }
+        }
+    }
+
+    private fun requestLocation() {
+        val locationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                // Получите координаты пользователя
+                val userLocation = Point(location.latitude, location.longitude)
+                // Здесь вы можете выполнить другие действия с новыми координатами пользователя.
+
+                // Установите START_POSITION на текущие координаты
+                val updatedStartPosition = CameraPosition(userLocation, 13.0f, 0f, 0f)
+                map.move(updatedStartPosition)
+
+                // Запрос маршрута только если координаты получены
+                if (!locationReceived) {
+                    locationReceived = true
+                    requestRoute(userLocation, updatedStartPosition)
+
+                    // Теперь, когда у нас есть координаты пользователя и маршрут, сделаем карту видимой
+
+                }
+
+                // Остановите обновления местоположения, если они больше не нужны
+                locationManager.removeUpdates(this)
+            }
+        }
+
+        // Запросите обновления местоположения пользователя
+        if (checkLocationPermission()) {
+            locationManager.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER, // Изменили на NETWORK_PROVIDER
+                0,
+                0f,
+                locationListener
+            )
+        }
+    }
+
+    private var locationReceived = false
+
+    private fun requestRoute(userLocation: Point, startPosition: CameraPosition) {
+        val DEFAULT_POINTS = listOf(
+            userLocation,
+            Point(51.529153, 45.976746),
+        )
+
+        routePoints = DEFAULT_POINTS
+
+        map.move(startPosition)
+        onRoutePointsUpdated()
+    }
+
+    private fun onRoutePointsUpdated() {
+        placemarksCollection.clear()
+
+        if (routePoints.isEmpty()) {
+            drivingSession?.cancel()
+            routes = emptyList()
+            return
+        }
+
+        val imageProvider = ImageProvider.fromResource(this, R.drawable.marker_png_48_ico)
+        routePoints.forEach {
+            placemarksCollection.addPlacemark(
+                it,
+                imageProvider,
+                IconStyle().apply {
+                    scale = 0.5f
+                    zIndex = 20f
+                }
+            )
+        }
+
+        if (routePoints.size < 2) return
+
+        val requestPoints = buildList {
+            add(RequestPoint(routePoints.first(), RequestPointType.WAYPOINT, null, null))
+            addAll(
+                routePoints.subList(1, routePoints.size - 1)
+                    .map { RequestPoint(it, RequestPointType.VIAPOINT, null, null) })
+            add(RequestPoint(routePoints.last(), RequestPointType.WAYPOINT, null, null))
+        }
+
+        val drivingOptions = DrivingOptions()
+        val vehicleOptions = VehicleOptions()
+
+        drivingSession = drivingRouter.requestRoutes(
+            requestPoints,
+            drivingOptions,
+            vehicleOptions,
+            drivingRouteListener,
+        )
+    }
+
+    private fun onRoutesUpdated() {
+        routesCollection.clear()
+        if (routes.isEmpty()) return
+
+        routes.forEachIndexed { index, route ->
+            routesCollection.addPolyline(route.geometry).apply {
+                if (index == 0) styleMainRoute() else styleAlternativeRoute()
+            }
+        }
+    }
+
+    private fun PolylineMapObject.styleMainRoute() {
+        zIndex = 10f
+        setStrokeColor(R.color.primaryElementsColor)
+//        setStrokeColor(ContextCompat.getColor(this@MainActivity, CommonColors.gray))
+        strokeWidth = 5f
+        outlineColor = (R.color.black)
+//        ContextCompat.getColor(this@MainActivity, CommonColors.black)
+        outlineWidth = 3f
+    }
+
+    private fun PolylineMapObject.styleAlternativeRoute() {
+        zIndex = 5f
+//        setStrokeColor(ContextCompat.getColor(this@MainActivity, CommonColors.light_blue))
+        setStrokeColor(R.color.secondaryElementsColor)
+        strokeWidth = 4f
+        outlineColor = (R.color.black)
+//        ContextCompat.getColor(this@MainActivity, CommonColors.black)
+        outlineWidth = 2f
     }
 
     private fun setDepartmentLayout(){
