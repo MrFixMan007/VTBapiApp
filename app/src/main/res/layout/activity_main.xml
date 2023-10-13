@@ -23,11 +23,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <include
-            android:id="@+id/includedLayout"
-            layout="@layout/bottom_layout"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent">
+            <include
+                android:id="@+id/includedLayout"
+                layout="@layout/bottom_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <include
+                android:id="@+id/assistantIncludedLayout"
+                layout="@layout/assist_gpt_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </com.example.vtbapiapp.CustomScrollView>
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

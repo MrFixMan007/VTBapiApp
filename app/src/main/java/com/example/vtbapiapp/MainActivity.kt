@@ -10,12 +10,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -45,7 +47,7 @@ import com.yandex.runtime.image.ImageProvider
 import com.yandex.runtime.network.NetworkError
 
 
-class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener {
+class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener, ChatAdapter.Listener {
     private lateinit var binding: ActivityMainBinding
 
     private var searches: Boolean = false
@@ -56,6 +58,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private val adapter = DepartmentHistoryAdapter(this)
     private val adapterFavorite = DepartmentFavoriteAdapter(this)
     private val adapterSearched = DepartmentSearchedAdapter(this)
+    private val adapterChat = ChatAdapter(this, this)
 
     private lateinit var slidingUpLayout : SlidingUpPanelLayout
 
@@ -70,6 +73,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var searchedRecycleViewWhenSearch: RecyclerView
 //    private lateinit var filterButtonWhenSearch: ImageButton
 
+    private lateinit var mainIncludedLayout: ViewGroup
     private lateinit var departmentInfoIncludedLayout: ViewGroup
 
     private lateinit var customScrollView: CustomScrollView
@@ -116,6 +120,14 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var addressToEditText: EditText
 //    private lateinit var cancelRouteImageButton: ImageButton
 //    private lateinit var goButton: Button
+
+    private lateinit var callAssistantButton: Button
+    private lateinit var assistantCancelImageButton: ImageButton
+    private lateinit var sendToAssistantImageButton: ImageButton
+    private lateinit var assistantIncludedLayout: ViewGroup
+    private lateinit var assistantEditText: EditText
+
+    private lateinit var chatRecyclerView: RecyclerView
 
 
     private val departmentList = listOf(
@@ -234,6 +246,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             adapterFavorite.addDepartmentAll(departmentFavoiriteList)
             includedLayout.favouritesRecycleView.isNestedScrollingEnabled = false
 
+            chatRecyclerView = findViewById(R.id.chatRecyclerView)
+            chatRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
+            chatRecyclerView.adapter = adapterChat
+            chatRecyclerView.isNestedScrollingEnabled = false
+
 //            val layoutParams: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
 //                ConstraintLayout.LayoutParams.WRAP_CONTENT, // Ширина кнопки
 //                ConstraintLayout.LayoutParams.WRAP_CONTENT  // Высота кнопки
@@ -290,6 +307,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         appWidthPixels = displayMetrics.widthPixels
         appHeightPixels = displayMetrics.heightPixels
 
+        mainIncludedLayout = findViewById(R.id.includedLayout)
         findViewById<ImageView>(R.id.lineImageView).setOnClickListener{
             if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.ANCHORED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
         else slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
@@ -422,17 +440,42 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         loadConstTextView = findViewById(R.id.loadConstTextView)
         loadDataTextView = findViewById(R.id.loadDataTextView)
 
+        callAssistantButton = findViewById(R.id.callAssistantButton)
+        assistantIncludedLayout = findViewById(R.id.assistantIncludedLayout)
+        assistantCancelImageButton = findViewById(R.id.assistantCancelImageButton)
+        sendToAssistantImageButton = findViewById(R.id.sendToAssistantImageButton)
+        assistantEditText = findViewById(R.id.assistantEditText)
+
 //        routeIncludedLayout = findViewById(R.id.routeIncludedLayout)
 //        cancelConstantTextView = findViewById(R.id.cancelConstantTextView)
 //        cancelRouteImageButton = findViewById(R.id.cancelRouteImageButton)
 //        goButton = findViewById(R.id.goButton)
 
-        cancelDepartmentInfoImageButton.setOnClickListener { setMainLayout() }
+        cancelDepartmentInfoImageButton.setOnClickListener {
+            setMainLayout()
+        }
 //        cancelRouteImageButton.setOnClickListener {
 //            routeIncludedLayout.visibility = View.GONE
 //            setDepartmentLayout()
 //        }
         routeImageButton.setOnClickListener { setRoute() }
+
+        callAssistantButton.setOnClickListener { setAssistantLayout() }
+        assistantCancelImageButton.setOnClickListener {
+            assistantIncludedLayout.visibility = View.GONE
+            mainIncludedLayout.visibility = View.VISIBLE
+            setMainLayout()
+            adapterChat.clearList()
+            assistantEditText.setText("")
+        }
+        sendToAssistantImageButton.setOnClickListener {
+            val text = assistantEditText.text.toString()
+            if(text != ""){
+                adapterChat.addChatItem(ChatMessage(text))
+
+                adapterChat.addChatItem(ChatMessage("Привет", false))
+            }
+        }
     }
 
     override fun onStart() {
@@ -713,5 +756,16 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
         Log.e("Anchoe", "${slidingUpLayout.anchorPoint}")
         Log.e("Anchoe", "${slidingUpLayout.panelHeight}")
+    }
+
+    private fun setAssistantLayout(){
+        mainIncludedLayout.visibility = View.GONE
+
+        val layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+            appHeightPixels // Высота в пикселях или другой единице измерения
+        )
+        assistantIncludedLayout.layoutParams = layoutParams
+        assistantIncludedLayout.visibility = View.VISIBLE
     }
 }

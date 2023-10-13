@@ -14,4 +14,7 @@
     <string name="myLocation">Моё местоположение</string>
     <string name="go">Поехали</string>
     <string name="where">Куда</string>
+    <string name="assistant_terenty">Помощник Терентий</string>
+    <string name="assistant">Помощник</string>
+    <string name="write_your_question">Напишите свой вопрос</string>
 </resources>

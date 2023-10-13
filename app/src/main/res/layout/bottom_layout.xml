@@ -160,6 +160,16 @@
         tools:layout_editor_absoluteX="-7dp"
         tools:layout_editor_absoluteY="122dp" />
 
+    <Button
+        android:id="@+id/callAssistantButton"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:layout_marginLeft="@dimen/marginLeftRight"
+        android:text="@string/assistant"
+        style="@style/CustomActionButtonAssistant"
+        app:layout_constraintStart_toEndOf="@+id/filterButton"
+        app:layout_constraintTop_toTopOf="@+id/filterButton" />
+
     <!--    <include-->
 <!--        android:id="@+id/routeIncludedLayout"-->
 <!--        layout="@layout/route_layout"-->

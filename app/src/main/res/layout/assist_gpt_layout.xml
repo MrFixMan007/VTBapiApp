@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
+
+
+    <TextView
+        android:id="@+id/assistantConstantTextView"
+        style="@style/CustomPrimaryTextView."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/assistant_terenty"
+        app:layout_constraintBottom_toBottomOf="@+id/assistantCancelImageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/assistantCancelImageButton"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/arrow_to_down_ico"
+        android:background="@color/transparent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginTop"
+        app:layout_constraintTop_toBottomOf="@+id/assistantCancelImageButton" />
+
+    <EditText
+        android:id="@+id/assistantEditText"
+        style="@style/CustomEditText."
+        android:background="@drawable/rounded_edittext"
+        android:layout_width="0dp"
+        android:layout_marginLeft="@dimen/marginLeftRight"
+        android:layout_marginRight="@dimen/marginLeftRight"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/marginLeftRight"
+        android:hint="@string/write_your_question"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toBottomOf="@+id/sendToAssistantImageButton"
+        app:layout_constraintEnd_toStartOf="@+id/sendToAssistantImageButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/sendToAssistantImageButton" />
+
+    <ImageButton
+        android:id="@+id/sendToAssistantImageButton"
+        android:layout_width="@dimen/heightOfSearchEditText"
+        android:layout_height="@dimen/heightOfSearchEditText"
+        android:background="@drawable/rounded_action_button"
+        android:layout_marginRight="@dimen/marginLeftRight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/send_ico"
+        app:layout_constraintVertical_bias="0.98" />
+</androidx.constraintlayout.widget.ConstraintLayout>

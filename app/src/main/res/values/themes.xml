@@ -3,6 +3,7 @@
     <style name="Base.Theme.VTBapiApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/primaryElementsColor</item>
+        <item name="android:textSize">18dp</item>
     </style>
     <style name="CustomEditText." parent="Widget.AppCompat.EditText">
         <item name="android:textColor">@color/secondaryElementsColor</item>
@@ -37,6 +38,12 @@
         <item name="backgroundTint">@color/specialActionElementsColor</item>
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="android:textSize">@dimen/t1</item>
+    </style>
+    <style name="CustomActionButtonAssistant" parent="Widget.AppCompat.Button">
+        <item name="backgroundTint">@color/specialActionElementsColor</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">@dimen/t2</item>
+        <item name="android:background">@drawable/rounded_action_button</item>
     </style>
     <!--    <style name="EditTextInput" parent="ThemeOverlay.Material3.TextInputEditText">-->
     <!--        <item name="colorPrimary">@color/black</item>-->
