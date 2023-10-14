@@ -734,6 +734,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     override fun onClickDeleteItem(department: RecentlyDepartmentWithDepartment) {
+        runBlocking { database.recentlyDepartmentDAO().deleteRecently(department.recentlyDepartment) }
         adapter.deleteDepartment(department)
     }
 
@@ -746,6 +747,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     override fun onClickDeleteItem(department: FavoriteDepartmentWithDepartment) {
+        runBlocking { database.favoriteDepartmentDAO().deleteFavorite(department.favoritesEntity) }
         adapterFavorite.deleteDepartment(department)
     }
 

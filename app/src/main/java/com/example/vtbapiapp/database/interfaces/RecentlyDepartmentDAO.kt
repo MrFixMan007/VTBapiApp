@@ -1,6 +1,7 @@
 package com.example.vtbapiapp.database.interfaces
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -15,6 +16,8 @@ interface RecentlyDepartmentDAO {
 
     @Query("DELETE FROM recently_departments WHERE id = :id")
     suspend fun deleteById(id: Int)
+    @Delete
+    suspend fun deleteRecently(recentlyDepartment: RecentlyDepartment)
     @Query("DELETE FROM recently_departments WHERE id = :departmentId")
     suspend fun deleteByDepartmentId(departmentId: Long)
 
