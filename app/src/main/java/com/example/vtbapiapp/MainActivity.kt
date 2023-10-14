@@ -24,6 +24,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import com.example.vtbapiapp.*
 import com.example.vtbapiapp.common.Common
 import com.example.vtbapiapp.database.AppDatabase
 import com.example.vtbapiapp.database.dtos.DepartmentDto
@@ -170,13 +171,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 //        Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
 //        Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
 //        )//TODO: динамическое заполнение
-    private val citiesSearchList = listOf(
-        City("Москва"),
-        City("Саратов"),
-        City("Краснодар"),
-        City("Самара"),
-        City("Санкт-Петербург"),
-        )//TODO: динамическое заполнение
 
     // Код для карт _____________________________________________
     private lateinit var mapView: MapView
@@ -326,6 +320,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         val departmentSearchedAdapter = departmentSearchList.map { SearchDepartment(it,"",(getWorkLoad(it)?: mutableMapOf()).toString(),getDay(it,currentDayOfWeek)) }
 
 
+        val citiesSearchList = getAllLocality().map { Locality(it.key,it.value) }
+
         binding.apply {
             includedLayout.searchedRecycleViewWhenSearch.layoutManager = LinearLayoutManager(this@MainActivity)
             includedLayout.searchedRecycleViewWhenSearch.adapter = adapterSearched
@@ -353,7 +349,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             citiesAdapter.addCityAll(citiesSearchList)
             searchedCityRecycleView.isNestedScrollingEnabled = false
 
-            Log.i("city", citiesAdapter.cityList.toString())
+            Log.i("city", citiesAdapter.localityList.toString())
 
 //            val layoutParams: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
 //                ConstraintLayout.LayoutParams.WRAP_CONTENT, // Ширина кнопки
@@ -364,6 +360,28 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         }
     }
 
+    private fun getAllLocality():kotlin.collections.Map<Long, String>{
+        val call= retrofitServices.findAllLocalityNamesOnly()
+        val localityNames = mutableMapOf<Long,String>()
+        call.enqueue(object : Callback<kotlin.collections.Map<Long, String>> {
+            override fun onResponse(
+                call: Call<kotlin.collections.Map<Long, String>>,
+                response: Response<kotlin.collections.Map<Long, String>>
+            ) {
+                if (response.isSuccessful()) {
+                    val localityNames  = response.body()
+                    Log.e("Locality","$localityNames")
+                } else {
+                    Log.e("Locality","Ошибка запроса")
+                }
+            }
+
+            override fun onFailure(call: Call<kotlin.collections.Map<Long, String>>, t: Throwable) {
+                Log.e("Locality","$t")
+            }
+        })
+        return localityNames
+    }
     private fun getWorkLoad(departmentDto: DepartmentDto) :kotlin.collections.Map<Long,Int>?{
         val call = retrofitServices.getWorkloadOfDepartment(departmentDto.id)
         var result: kotlin.collections.Map<Long, Int>? = null
@@ -707,7 +725,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         //TODO: подставка
     }
 
-    override fun onClickItem(city: City) {
+    override fun onClickItem(locality: Locality) {
 
     }
 

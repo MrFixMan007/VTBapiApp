@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.vtbapiapp.databinding.CityItemBinding
 
 class CitiesAdapter(val listener: CitiesAdapter.Listener) : RecyclerView.Adapter<CitiesAdapter.CityHolder>() {
-    val cityList = ArrayList<City>()
+    val localityList = mutableListOf<Locality>()
     class CityHolder(item: View) : RecyclerView.ViewHolder(item) {
         val binding =  CityItemBinding.bind(item)
-        fun bind(city: City, listener: Listener) = with(binding){
-            cityNameTextView.setText(city.name)
+        fun bind(locality: Locality, listener: Listener) = with(binding){
+            cityNameTextView.setText(locality.name)
         }
     }
 
@@ -21,35 +21,35 @@ class CitiesAdapter(val listener: CitiesAdapter.Listener) : RecyclerView.Adapter
     }
 
     override fun getItemCount(): Int {
-        return cityList.size
+        return localityList.size
     }
 
     override fun onBindViewHolder(holder: CityHolder, position: Int) {
-        holder.bind(cityList[position], listener)
+        holder.bind(localityList[position], listener)
 
     }
 
-    fun addCity(department: City){
-        cityList.add(department)
+    fun addCity(department: Locality){
+        localityList.add(department)
         notifyDataSetChanged()
     }
 
-    fun addCityAll(departments: List<City>){
-        cityList.addAll(departments)
+    fun addCityAll(departments: List<Locality>){
+        localityList.addAll(departments)
         notifyDataSetChanged()
     }
 
     fun deleteCityOnPosition(position: Int){
-        cityList.remove(cityList.get(position))
+        localityList.remove(localityList.get(position))
         notifyDataSetChanged()
     }
 
-    fun deleteCity(department: City){
-        cityList.remove(department)
+    fun deleteCity(department: Locality){
+        localityList.remove(department)
         notifyDataSetChanged()
     }
 
     interface Listener{
-        fun onClickItem(department: City)
+        fun onClickItem(department: Locality)
     }
 }

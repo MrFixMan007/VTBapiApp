@@ -10,10 +10,13 @@ import com.example.vtbapiapp.database.dtos.WorkDaysDto
 import retrofit2.Call
 import retrofit2.http.*
 
+
 interface RetrofitServices {
     @GET("department/getDepartment")
     fun getDepartment():Call<ArrayList<DepartmentDto>>
 
+    @GET("/findAllNamesOnly")
+    fun findAllLocalityNamesOnly(): Call<Map<Long, String>>
     @GET("workDays/getWorkDays")
     fun getWorkDays():Call<ArrayList<WorkDaysDto>>
 

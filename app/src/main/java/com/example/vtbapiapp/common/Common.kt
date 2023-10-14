@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object Common {
-    private const val BASE_URL = "http://188.93.29.224:8081/"
+    private const val BASE_URL = "http://localhost:8081/"
     private val gson = GsonBuilder()
         .setLenient() // Разрешить неправильно отформатированный JSON
         .create()
