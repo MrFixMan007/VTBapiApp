@@ -25,6 +25,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ImageButton
+                android:layout_width="@dimen/heightOfSearchEditText"
+                android:layout_height="@dimen/heightOfSearchEditText"
+                sothree:layout_constraintTop_toTopOf="parent"
+                sothree:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/callChatImageButton"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="60dp"
+                android:src="@drawable/chat_gpt_ico"
+                android:background="@drawable/rounded_action_button"
+                android:backgroundTint="@color/specialActionElementsColor"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigation_view"
             android:layout_width="wrap_content"

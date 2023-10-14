@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -159,7 +160,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var scrollView: CustomScrollView
     private lateinit var clearSearchAddressToImageView: ImageView
 
-//    private lateinit var callAssistantImageButton: ImageButton
+    private lateinit var callChatImageButton: ImageButton
 
 //
 //    private val departmentList = listOf(
@@ -265,7 +266,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
         // Инициализируем DrivingRouter для построения маршрутов
         drivingRouter = DirectionsFactory.getInstance().createDrivingRouter()
-
     }
 
     private fun initAdapters(){
@@ -648,6 +648,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         }
 
         driven = findViewById(R.id.driven)
+        driven.addDrawerListener(object : DrawerLayout.SimpleDrawerListener(){
+            override fun onDrawerClosed(drawerView: View) {
+                super.onDrawerClosed(drawerView)
+                slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
+            }
+        })
         listOfCitiesIncludedLayout = findViewById(R.id.listOfCitiesIncludedLayout)
         clearSearchCityImageView = findViewById(R.id.clearSearchCityImageView)
 
@@ -670,10 +676,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         navigation_view.setNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.listOfCitiesItem -> {
+                    callChatImageButton.visibility = View.INVISIBLE
                     setCitiesLayout()
                 }
                 R.id.settingsItem -> {
                     Toast.makeText(this, "Настройки в разработке", Toast.LENGTH_SHORT).show()
+                    callChatImageButton.visibility = View.INVISIBLE
                 }
             }
             slidingUpLayout.panelHeight = oldHeight
@@ -688,7 +696,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             addressToEditText.setText("")
         }
 
-//        callAssistantImageButton = findViewById(R.id.callAssistantImageButton)
+        callChatImageButton = findViewById(R.id.callChatImageButton)
     }
 
     override fun onStart() {
@@ -911,7 +919,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     private fun setDepartmentLayout(){
-//        callAssistantImageButton.visibility = View.GONE
+        callChatImageButton.visibility = View.INVISIBLE
         addressFromEditText.visibility = View.INVISIBLE
         addressToEditText.visibility = View.INVISIBLE
 
@@ -947,7 +955,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     private fun setMainLayout(){
         departmentInfoIncludedLayout.visibility = View.GONE
-//        callAssistantImageButton.visibility = View.VISIBLE
+        callChatImageButton.visibility = View.VISIBLE
         addressFromEditText.visibility = View.VISIBLE
         addressToEditText.visibility = View.VISIBLE
         moreButton.visibility = View.VISIBLE
