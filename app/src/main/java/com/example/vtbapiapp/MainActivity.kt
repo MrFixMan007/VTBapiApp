@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var moreButton: ImageButton
     private lateinit var filterButton: ImageButton
     private lateinit var reklamaImageView: ImageView
+    private lateinit var reklamaImageView2: ImageView
     private lateinit var recentlySearchedTextView: TextView
     private lateinit var recentlySearchedRecycleView: RecyclerView
     private lateinit var favouritesTextView: TextView
@@ -141,7 +142,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var cancelRouteImageButton: ImageButton
     private lateinit var goButton: ImageButton
 
-//    private lateinit var callAssistantButton: Button
     private lateinit var assistantCancelImageButton: ImageButton
     private lateinit var sendToAssistantImageButton: ImageButton
     private lateinit var assistantIncludedLayout: ViewGroup
@@ -157,6 +157,9 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var navigation_view: NavigationView
 
     private lateinit var scrollView: CustomScrollView
+    private lateinit var clearSearchAddressToImageView: ImageView
+
+//    private lateinit var callAssistantImageButton: ImageButton
 
 //
 //    private val departmentList = listOf(
@@ -501,6 +504,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         moreButton = findViewById(R.id.moreButton)
         filterButton = findViewById(R.id.filterButton)
         reklamaImageView = findViewById(R.id.reklamaImageView)
+        reklamaImageView2 = findViewById(R.id.reklamaImageView2)
         recentlySearchedTextView = findViewById(R.id.recentlySearchedTextView)
         recentlySearchedRecycleView = findViewById(R.id.recentlySearchedRecycleView)
         favouritesTextView = findViewById(R.id.favouritesTextView)
@@ -534,21 +538,22 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 moreButton.visibility = View.VISIBLE
                 filterButton.visibility = View.VISIBLE
                 reklamaImageView.visibility = View.VISIBLE
+                reklamaImageView2.visibility = View.VISIBLE
                 recentlySearchedTextView.visibility = View.VISIBLE
                 recentlySearchedRecycleView.visibility = View.VISIBLE
                 favouritesTextView.visibility = View.VISIBLE
                 favouritesRecycleView.visibility = View.VISIBLE
-//                callAssistantButton.visibility = View.VISIBLE
             }
             else if (text != "" && !searches){
                 searches = true
                 filterButtonWhenSearch.visibility = View.VISIBLE
                 searchedRecycleViewWhenSearch.visibility = View.VISIBLE
-//                callAssistantButton.visibility = View.GONE
 
                 moreButton.visibility = View.INVISIBLE
                 filterButton.visibility = View.GONE
                 reklamaImageView.visibility = View.GONE
+                reklamaImageView2.visibility = View.GONE
+                clearSearchAddressToImageView.visibility = View.VISIBLE
                 recentlySearchedTextView.visibility = View.GONE
                 recentlySearchedRecycleView.visibility = View.GONE
                 favouritesTextView.visibility = View.GONE
@@ -590,7 +595,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         loadConstTextView = findViewById(R.id.loadConstTextView)
         loadDataTextView = findViewById(R.id.loadDataTextView)
 
-//        callAssistantButton = findViewById(R.id.callAssistantButton)
         assistantIncludedLayout = findViewById(R.id.assistantIncludedLayout)
         assistantCancelImageButton = findViewById(R.id.assistantCancelImageButton)
         sendToAssistantImageButton = findViewById(R.id.sendToAssistantImageButton)
@@ -611,7 +615,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         }
         routeImageButton.setOnClickListener { setRoute() }
 
-//        callAssistantButton.setOnClickListener { setAssistantLayout() }
         assistantCancelImageButton.setOnClickListener {
             assistantIncludedLayout.visibility = View.GONE
             mainIncludedLayout.visibility = View.VISIBLE
@@ -659,6 +662,10 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
             driven.openDrawer(GravityCompat.END)
         }
+        clearSearchCityImageView.setOnClickListener{
+            listOfCitiesIncludedLayout.visibility = View.INVISIBLE
+            setMainLayout()
+        }
         navigation_view = findViewById(R.id.navigation_view)
         navigation_view.setNavigationItemSelectedListener {
             when(it.itemId){
@@ -675,6 +682,13 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             true
         }
         scrollView = findViewById(R.id.scrollView)
+        clearSearchAddressToImageView = findViewById(R.id.clearSearchAddressToImageView)
+
+        clearSearchAddressToImageView.setOnClickListener{
+            addressToEditText.setText("")
+        }
+
+//        callAssistantImageButton = findViewById(R.id.callAssistantImageButton)
     }
 
     override fun onStart() {
@@ -897,7 +911,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     private fun setDepartmentLayout(){
-//        callAssistantButton.visibility = View.GONE
+//        callAssistantImageButton.visibility = View.GONE
         addressFromEditText.visibility = View.INVISIBLE
         addressToEditText.visibility = View.INVISIBLE
 
@@ -907,6 +921,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         moreButton.visibility = View.INVISIBLE
         filterButton.visibility = View.INVISIBLE
         reklamaImageView.visibility = View.INVISIBLE
+        reklamaImageView2.visibility = View.INVISIBLE
+        clearSearchAddressToImageView.visibility = View.INVISIBLE
         recentlySearchedTextView.visibility = View.INVISIBLE
         recentlySearchedRecycleView.visibility = View.GONE
         favouritesTextView.visibility = View.INVISIBLE
@@ -931,11 +947,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     private fun setMainLayout(){
         departmentInfoIncludedLayout.visibility = View.GONE
-//        callAssistantButton.visibility = View.VISIBLE
+//        callAssistantImageButton.visibility = View.VISIBLE
         addressFromEditText.visibility = View.VISIBLE
         addressToEditText.visibility = View.VISIBLE
         moreButton.visibility = View.VISIBLE
         filterButton.visibility = View.VISIBLE
+        clearSearchAddressToImageView.visibility = View.VISIBLE
         if(searches){
             filterButtonWhenSearch.visibility = View.VISIBLE
             searchedRecycleViewWhenSearch.visibility = View.VISIBLE
@@ -944,6 +961,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             moreButton.visibility = View.VISIBLE
             filterButton.visibility = View.VISIBLE
             reklamaImageView.visibility = View.VISIBLE
+            reklamaImageView2.visibility = View.VISIBLE
             recentlySearchedTextView.visibility = View.VISIBLE
             recentlySearchedRecycleView.visibility = View.VISIBLE
             favouritesTextView.visibility = View.VISIBLE

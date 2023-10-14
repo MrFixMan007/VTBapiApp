@@ -34,6 +34,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/clearSearchAddressToImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/addressToEditText"
+        app:layout_constraintBottom_toBottomOf="@+id/addressToEditText"
+        app:layout_constraintEnd_toEndOf="@+id/addressToEditText"
+        android:src="@drawable/cross_small_ico"
+        android:layout_marginRight="5dp"
+        />
+
     <ImageButton
         android:id="@+id/moreButton"
         android:layout_width="@dimen/heightOfSearchEditText"
@@ -57,10 +68,23 @@
 
     <ImageView
         android:id="@+id/reklamaImageView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/filterButton"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/filterButton"
+        android:layout_marginTop="@dimen/marginTop"
+        android:src="@drawable/reklama"
+        android:background="@color/primaryElementsColor"
+        android:padding="5dp"
+        android:paddingVertical="5dp"
+        />
+    <ImageView
+        android:id="@+id/reklamaImageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/reklamaImageView"
+        app:layout_constraintTop_toBottomOf="@+id/filterButton"
+        android:paddingLeft="20dp"
         android:layout_marginTop="@dimen/marginTop"
         android:src="@drawable/reklama"
         android:background="@color/primaryElementsColor"
