@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -19,11 +18,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.vtbapiapp.databinding.ActivityMainBinding
+import com.google.android.material.navigation.NavigationView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.RequestPoint
@@ -132,6 +133,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var changeRouteIncludedLayout: ViewGroup
     private lateinit var cancelChangeRouteTextView: TextView
     private lateinit var addressToChangeRouteEditText: EditText
+
+    private lateinit var driven: DrawerLayout
+    private lateinit var navigation_view: NavigationView
+
+    private lateinit var scrollView: CustomScrollView
 
 
     private val departmentList = listOf(
@@ -282,7 +288,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         slidingUpLayout.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
 
             override fun onPanelSlide(panel: View, slideOffset: Float) {
-                //TODO: неполное развёртывание
                 Log.i("Slide", "onPanelSlide, offset $slideOffset")
             }
 
@@ -410,10 +415,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         addressFromEditText.addTextChangedListener {
             if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.EXPANDED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
         }
-        moreButton.setOnClickListener {
-            Log.e("RcView", "нажат на ${slidingUpLayout.panelState}")
-            //TODO: выдвижение настроек
-        }
 
         departmentInfoIncludedLayout = findViewById(R.id.departmentInfoIncludedLayout)
 
@@ -499,6 +500,35 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 setRoute()
             }
         }
+
+        driven = findViewById(R.id.driven)
+
+        var oldHeight = slidingUpLayout.panelHeight
+        moreButton.setOnClickListener{
+            oldHeight = slidingUpLayout.panelHeight
+            val layoutParams: ViewGroup.LayoutParams = navigation_view.getLayoutParams()
+            layoutParams.height = appHeightPixels
+            navigation_view.setLayoutParams(layoutParams)
+            slidingUpLayout.panelHeight = 0
+            slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+
+            driven.openDrawer(GravityCompat.END)
+        }
+        navigation_view = findViewById(R.id.navigation_view)
+        navigation_view.setNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.listOfCitiesItem -> {
+
+                }
+                R.id.settingsItem -> Toast.makeText(this, "Настройки в разработке", Toast.LENGTH_SHORT).show()
+            }
+
+            slidingUpLayout.panelHeight = oldHeight
+            slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
+            driven.closeDrawer(GravityCompat.END)
+            true
+        }
+        scrollView = findViewById(R.id.scrollView)
     }
 
     override fun onStart() {

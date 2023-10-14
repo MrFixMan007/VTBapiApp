@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item android:title="@string/list_of_cities"
+        android:id="@+id/listOfCitiesItem"></item>
+    <item android:title="@string/settings"
+        android:id="@+id/settingsItem"></item>
+
+</menu>

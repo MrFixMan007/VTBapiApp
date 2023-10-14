@@ -13,10 +13,30 @@
     tools:context=".MainActivity"
     android:background="@color/backgroundColor">
 
-    <com.yandex.mapkit.mapview.MapView
-        android:id="@+id/mapview"
+    <androidx.drawerlayout.widget.DrawerLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:id="@+id/driven"
+        tools:openDrawer="end"
+        >
+
+        <com.yandex.mapkit.mapview.MapView
+            android:id="@+id/mapview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            sothree:menu="@menu/nav_menu"
+            android:background="@color/backgroundColor"
+            sothree:itemTextColor="@color/primaryTextColor"
+            sothree:headerLayout="@layout/header"
+            />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
 
     <com.example.vtbapiapp.CustomScrollView
         android:id="@+id/scrollView"

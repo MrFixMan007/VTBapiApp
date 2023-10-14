@@ -50,4 +50,8 @@
     <!--    </style>-->
 
     <style name="Theme.VTBapiApp" parent="Base.Theme.VTBapiApp" />
+    <style name="NavigationViewTextAppearance">
+        <!-- Задание размера шрифта -->
+        <item name="android:textSize">40sp</item>
+    </style>
 </resources>
