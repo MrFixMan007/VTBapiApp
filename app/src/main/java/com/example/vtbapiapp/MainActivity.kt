@@ -48,7 +48,7 @@ import com.yandex.runtime.image.ImageProvider
 import com.yandex.runtime.network.NetworkError
 
 
-class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener, ChatAdapter.Listener {
+class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener, ChatAdapter.Listener, CitiesAdapter.Listener {
     private lateinit var binding: ActivityMainBinding
 
     private var searches: Boolean = false
@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private val adapterFavorite = DepartmentFavoriteAdapter(this)
     private val adapterSearched = DepartmentSearchedAdapter(this)
     private val adapterChat = ChatAdapter(this, this)
+    private val citiesAdapter = CitiesAdapter(this)
 
     private lateinit var slidingUpLayout : SlidingUpPanelLayout
 
@@ -152,6 +153,13 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
         Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
         )//TODO: динамическое заполнение
+    private val citiesSearchList = listOf(
+        City("Москва"),
+        City("Саратов"),
+        City("Краснодар"),
+        City("Самара"),
+        City("Санкт-Петербург"),
+        )//TODO: динамическое заполнение
 
     // Код для карт _____________________________________________
     private lateinit var mapView: MapView
@@ -197,6 +205,9 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private var drivingSession: DrivingSession? = null
     private lateinit var placemarksCollection: MapObjectCollection
     private lateinit var routesCollection: MapObjectCollection
+    private lateinit var listOfCitiesIncludedLayout: ViewGroup
+    private lateinit var clearSearchCityImageView: ImageView
+    private lateinit var searchedCityRecycleView: RecyclerView
 
     //_____________________________________________
 
@@ -260,6 +271,14 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             chatRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
             chatRecyclerView.adapter = adapterChat
             chatRecyclerView.isNestedScrollingEnabled = false
+
+            searchedCityRecycleView = findViewById(R.id.searchedCityRecycleView)
+            searchedCityRecycleView.layoutManager = LinearLayoutManager(this@MainActivity)
+            searchedCityRecycleView.adapter = citiesAdapter
+            citiesAdapter.addCityAll(citiesSearchList)
+            searchedCityRecycleView.isNestedScrollingEnabled = false
+
+            Log.i("city", citiesAdapter.cityList.toString())
 
 //            val layoutParams: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
 //                ConstraintLayout.LayoutParams.WRAP_CONTENT, // Ширина кнопки
@@ -502,6 +521,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         }
 
         driven = findViewById(R.id.driven)
+        listOfCitiesIncludedLayout = findViewById(R.id.listOfCitiesIncludedLayout)
+        clearSearchCityImageView = findViewById(R.id.clearSearchCityImageView)
 
         var oldHeight = slidingUpLayout.panelHeight
         moreButton.setOnClickListener{
@@ -518,11 +539,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         navigation_view.setNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.listOfCitiesItem -> {
-
+                    setCitiesLayout()
                 }
-                R.id.settingsItem -> Toast.makeText(this, "Настройки в разработке", Toast.LENGTH_SHORT).show()
+                R.id.settingsItem -> {
+                    Toast.makeText(this, "Настройки в разработке", Toast.LENGTH_SHORT).show()
+                }
             }
-
             slidingUpLayout.panelHeight = oldHeight
             slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
             driven.closeDrawer(GravityCompat.END)
@@ -576,6 +598,10 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         workTimesDataTextView.text = department.workTime
         setDepartmentLayout()
         //TODO: подставка
+    }
+
+    override fun onClickItem(city: City) {
+
     }
 
     override fun onClickDeleteItem(department: Department) {
@@ -734,6 +760,15 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         outlineColor = (R.color.black)
 //        ContextCompat.getColor(this@MainActivity, CommonColors.black)
         outlineWidth = 2f
+    }
+
+    private fun setCitiesLayout(){
+        val layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+            appHeightPixels // Высота в пикселях или другой единице измерения
+        )
+        listOfCitiesIncludedLayout.layoutParams = layoutParams
+        listOfCitiesIncludedLayout.visibility = View.VISIBLE
     }
 
     private fun setDepartmentLayout(){

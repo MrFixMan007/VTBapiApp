@@ -73,6 +73,13 @@
                 android:layout_height="match_parent"
                 android:visibility="invisible"/>
 
+            <include
+                android:id="@+id/listOfCitiesIncludedLayout"
+                layout="@layout/list_of_cities"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.example.vtbapiapp.CustomScrollView>
