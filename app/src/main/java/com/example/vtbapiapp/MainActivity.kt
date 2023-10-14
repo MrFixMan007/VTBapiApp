@@ -319,8 +319,13 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
         val departmentSearchedAdapter = departmentSearchList.map { SearchDepartment(it,"",(getWorkLoad(it)?: mutableMapOf()).toString(),getDay(it,currentDayOfWeek)) }
 
-
-        val citiesSearchList = getAllLocality().map { Locality(it.key,it.value) }
+        val citiesSearchList = mutableListOf<Locality>()
+        citiesSearchList.addAll(getAllLocality().map { Locality(it.key,it.value) }.toMutableList())
+        citiesSearchList.add(Locality(1,"Москва"))
+        citiesSearchList.add(Locality(2,"Питер"))
+        citiesSearchList.add(Locality(3,"Татарстан"))
+        citiesSearchList.add(Locality(4,"Цех"))
+        citiesSearchList.add(Locality(5,"ЦЫЦ"))
 
         binding.apply {
             includedLayout.searchedRecycleViewWhenSearch.layoutManager = LinearLayoutManager(this@MainActivity)
@@ -346,7 +351,27 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             searchedCityRecycleView = findViewById(R.id.searchedCityRecycleView)
             searchedCityRecycleView.layoutManager = LinearLayoutManager(this@MainActivity)
             searchedCityRecycleView.adapter = citiesAdapter
-            citiesAdapter.addCityAll(citiesSearchList)
+            val call= retrofitServices.findAllLocalityNamesOnly()
+            var localityNames = mapOf<Long,String>()
+            call.enqueue(object : Callback<kotlin.collections.Map<Long, String>> {
+                override fun onResponse(
+                    call: Call<kotlin.collections.Map<Long, String>>,
+                    response: Response<kotlin.collections.Map<Long, String>>
+                ) {
+                    if (response.isSuccessful) {
+                        localityNames  = response.body()?: mapOf<Long, String>()
+                        citiesAdapter.addCityAll(localityNames.map { Locality(it.key,it.value) })
+                        Log.e("Locality","$localityNames")
+                    } else {
+                        Log.e("Locality","Ошибка запроса")
+                    }
+                }
+
+                override fun onFailure(call: Call<kotlin.collections.Map<Long, String>>, t: Throwable) {
+                    Log.e("Locality","$t")
+                }
+            })
+
             searchedCityRecycleView.isNestedScrollingEnabled = false
 
             Log.i("city", citiesAdapter.localityList.toString())
@@ -362,14 +387,14 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     private fun getAllLocality():kotlin.collections.Map<Long, String>{
         val call= retrofitServices.findAllLocalityNamesOnly()
-        val localityNames = mutableMapOf<Long,String>()
+        var localityNames = mapOf<Long,String>()
         call.enqueue(object : Callback<kotlin.collections.Map<Long, String>> {
             override fun onResponse(
                 call: Call<kotlin.collections.Map<Long, String>>,
                 response: Response<kotlin.collections.Map<Long, String>>
             ) {
-                if (response.isSuccessful()) {
-                    val localityNames  = response.body()
+                if (response.isSuccessful) {
+                    localityNames  = response.body()?: mapOf<Long, String>()
                     Log.e("Locality","$localityNames")
                 } else {
                     Log.e("Locality","Ошибка запроса")

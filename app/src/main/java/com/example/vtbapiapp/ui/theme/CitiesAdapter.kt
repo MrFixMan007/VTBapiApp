@@ -9,9 +9,9 @@ import com.example.vtbapiapp.databinding.CityItemBinding
 class CitiesAdapter(val listener: CitiesAdapter.Listener) : RecyclerView.Adapter<CitiesAdapter.CityHolder>() {
     val localityList = mutableListOf<Locality>()
     class CityHolder(item: View) : RecyclerView.ViewHolder(item) {
-        val binding =  CityItemBinding.bind(item)
+        private val binding =  CityItemBinding.bind(item)
         fun bind(locality: Locality, listener: Listener) = with(binding){
-            cityNameTextView.setText(locality.name)
+            cityNameTextView.text = locality.name
         }
     }
 
@@ -40,7 +40,7 @@ class CitiesAdapter(val listener: CitiesAdapter.Listener) : RecyclerView.Adapter
     }
 
     fun deleteCityOnPosition(position: Int){
-        localityList.remove(localityList.get(position))
+        localityList.remove(localityList[position])
         notifyDataSetChanged()
     }
 

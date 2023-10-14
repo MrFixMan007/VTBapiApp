@@ -15,7 +15,7 @@ interface RetrofitServices {
     @GET("department/getDepartment")
     fun getDepartment():Call<ArrayList<DepartmentDto>>
 
-    @GET("/findAllNamesOnly")
+    @GET("locality/findAllNamesOnly")
     fun findAllLocalityNamesOnly(): Call<Map<Long, String>>
     @GET("workDays/getWorkDays")
     fun getWorkDays():Call<ArrayList<WorkDaysDto>>
