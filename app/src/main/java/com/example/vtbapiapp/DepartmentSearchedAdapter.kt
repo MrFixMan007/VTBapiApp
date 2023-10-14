@@ -1,21 +1,25 @@
-package com.example.vtbapiapp
+package com.yandex.mapkitdemo.routing
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.vtbapiapp.R
+import com.example.vtbapiapp.SearchDepartment
 import com.example.vtbapiapp.databinding.SearchedDepartmentItemBinding
+import kotlinx.coroutines.runBlocking
 
-class DepartmentSearchedAdapter(val listener: DepartmentSearchedAdapter.Listener) : RecyclerView.Adapter<DepartmentSearchedAdapter.DepartmentHolder>() {
-    val departmentList = ArrayList<Department>()
+
+class DepartmentSearchedAdapter(val listener: Listener) : RecyclerView.Adapter<DepartmentSearchedAdapter.DepartmentHolder>() {
+    val departmentList = mutableListOf<SearchDepartment>()
     class DepartmentHolder(item: View) : RecyclerView.ViewHolder(item) {
         val binding = SearchedDepartmentItemBinding.bind(item)
-        fun bind(department: Department, listener: Listener) = with(binding){
-            addressDepartmentTextView.text = department.address
-            loadDepartmentTextView.text = department.load.toString()
-            phoneDepartmentTextView.text = department.phone
-            distDepartmentTextView.text = department.dist.toString()
-            workTimesDepartmentTextView.text = department.workTime
+        fun bind(department: SearchDepartment, listener: Listener) = with(binding){
+            addressDepartmentTextView.text = department.departmentDto.address
+            loadDepartmentTextView.text = department.load // загруженность
+            phoneDepartmentTextView.text = department.departmentDto.phone
+            distDepartmentTextView.text =department.dist
+            workTimesDepartmentTextView.text =department.workTime
 
             itemView.setOnClickListener {
                 listener.onClickItem(department)
@@ -37,28 +41,28 @@ class DepartmentSearchedAdapter(val listener: DepartmentSearchedAdapter.Listener
 
     }
 
-    fun addDepartment(department: Department){
+    fun addDepartment(department: SearchDepartment){
         departmentList.add(department)
         notifyDataSetChanged()
     }
 
-    fun addDepartmentAll(departments: List<Department>){
+    fun addDepartmentAll(departments: List<SearchDepartment>){
         departmentList.addAll(departments)
         notifyDataSetChanged()
     }
 
     fun deleteDepartmentOnPosition(position: Int){
-        departmentList.remove(departmentList.get(position))
+        departmentList.remove(departmentList[position])
         notifyDataSetChanged()
     }
 
-    fun deleteDepartment(department: Department){
+    fun deleteDepartment(department: SearchDepartment){
         departmentList.remove(department)
         notifyDataSetChanged()
     }
 
     interface Listener{
-        fun onClickItem(department: Department)
-        fun onClickDeleteItem(department: Department)
+        fun onClickItem(department: SearchDepartment)
+        fun onClickDeleteItem(department: SearchDepartment)
     }
 }

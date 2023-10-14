@@ -4,15 +4,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.vtbapiapp.database.entitys.withEntity.RecentlyDepartmentWithDepartment
 import com.example.vtbapiapp.databinding.HistoryDepartmentItemBinding
 
+
 class DepartmentHistoryAdapter(val listener: Listener) : RecyclerView.Adapter<DepartmentHistoryAdapter.DepartmentHolder>() {
-    val departmentList = ArrayList<DepartmentForHistory>()
+    val departmentList = mutableListOf<RecentlyDepartmentWithDepartment>()
     class DepartmentHolder(item: View) : RecyclerView.ViewHolder(item) {
         val binding = HistoryDepartmentItemBinding.bind(item)
-        fun bind(department: DepartmentForHistory, listener: Listener) = with(binding){
-            addressDepartmentTextView.text = department.address
-            nameDepartmentTextView.text = department.name
+        fun bind(department: RecentlyDepartmentWithDepartment, listener: Listener) = with(binding){
+            addressDepartmentTextView.text = department.department.address
+            nameDepartmentTextView.text = department.department.description
             itemView.setOnClickListener {
                 listener.onClickItem(department)
             }
@@ -36,28 +38,28 @@ class DepartmentHistoryAdapter(val listener: Listener) : RecyclerView.Adapter<De
 
     }
 
-    fun addDepartment(department: DepartmentForHistory){
+    fun addDepartment(department: RecentlyDepartmentWithDepartment){
         departmentList.add(department)
         notifyDataSetChanged()
     }
 
-    fun addDepartmentAll(departments: List<DepartmentForHistory>){
+    fun addDepartmentAll(departments: List<RecentlyDepartmentWithDepartment>){
         departmentList.addAll(departments)
         notifyDataSetChanged()
     }
 
     fun deleteDepartmentOnPosition(position: Int){
-        departmentList.remove(departmentList.get(position))
+        departmentList.remove(departmentList[position])
         notifyDataSetChanged()
     }
 
-    fun deleteDepartment(department: DepartmentForHistory){
+    fun deleteDepartment(department: RecentlyDepartmentWithDepartment){
         departmentList.remove(department)
         notifyDataSetChanged()
     }
 
     interface Listener{
-        fun onClickItem(department: DepartmentForHistory)
-        fun onClickDeleteItem(department: DepartmentForHistory)
+        fun onClickItem(department: RecentlyDepartmentWithDepartment)
+        fun onClickDeleteItem(department: RecentlyDepartmentWithDepartment)
     }
 }

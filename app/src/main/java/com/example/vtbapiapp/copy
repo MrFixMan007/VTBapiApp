@@ -1,38 +1,34 @@
-package com.example.vtbapiapp
+package com.yandex.mapkitdemo.routing
 
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-import androidx.core.view.GravityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
-import com.example.vtbapiapp.common.Common
-import com.example.vtbapiapp.database.AppDatabase
-import com.example.vtbapiapp.database.dtos.DepartmentDto
-import com.example.vtbapiapp.database.dtos.LocalityDto
-import com.example.vtbapiapp.database.entitys.withEntity.FavoriteDepartmentWithDepartment
-import com.example.vtbapiapp.database.entitys.withEntity.RecentlyDepartmentWithDepartment
-import com.example.vtbapiapp.databinding.ActivityMainBinding
-import com.google.android.material.navigation.NavigationView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import com.yandex.mapkit.GeoObjectCollection
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.RequestPoint
 import com.yandex.mapkit.RequestPointType
@@ -41,16 +37,43 @@ import com.yandex.mapkit.directions.driving.DrivingOptions
 import com.yandex.mapkit.directions.driving.DrivingRoute
 import com.yandex.mapkit.directions.driving.DrivingRouter
 import com.yandex.mapkit.directions.driving.DrivingSession
+import com.yandex.mapkit.directions.driving.RoadVehicleRestriction
+import com.yandex.mapkit.directions.driving.RoutePoint
+import com.yandex.mapkit.directions.driving.TollRoadsPriceListener
 import com.yandex.mapkit.directions.driving.VehicleOptions
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.geometry.geo.PolylineIndex
+import com.yandex.mapkit.geometry.geo.PolylineUtils
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
-import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PolylineMapObject
+import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
-import com.yandex.mapkitdemo.routing.DepartmentSearchedAdapter
+import com.yandex.mapkit.search.SearchFactory
+import com.yandex.mapkit.search.SearchManager
+import com.yandex.mapkit.search.SearchManagerType
+import com.yandex.mapkit.search.SearchOptions
+import com.yandex.mapkit.search.SearchType
+import com.yandex.mapkit.search.Session
+import com.yandex.mapkit.transport.TransportFactory
+import com.yandex.mapkitdemo.common.CommonColors
+import com.yandex.mapkitdemo.common.CommonId
+import com.yandex.mapkitdemo.common.showToast
+import com.yandex.mapkitdemo.routing.*
+import com.yandex.mapkitdemo.routing.database.AppDatabase
+import com.yandex.mapkitdemo.routing.databinding.ActivityMainBinding
+import com.yandex.mapkitdemo.routing.database.dtos.CountryDto
+import com.yandex.mapkitdemo.routing.database.dtos.DayDto
+import com.yandex.mapkitdemo.routing.database.dtos.DepartmentDto
+import com.yandex.mapkitdemo.routing.database.dtos.LocalityDto
+import com.yandex.mapkitdemo.routing.database.dtos.StateDto
+import com.yandex.mapkitdemo.routing.database.dtos.WorkDaysDto
+import com.yandex.mapkitdemo.routing.database.entitys.RecentlyDepartment
+import com.yandex.mapkitdemo.routing.database.entitys.withEntity.FavoriteDepartmentWithDepartment
+import com.yandex.mapkitdemo.routing.database.entitys.withEntity.RecentlyDepartmentWithDepartment
+import com.yandex.mapkitdemo.routing.theme.SearchDepartment
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import com.yandex.runtime.network.NetworkError
@@ -62,12 +85,51 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 
-class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener, ChatAdapter.Listener, CitiesAdapter.Listener {
-    private lateinit var binding: ActivityMainBinding
+class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener {
     companion object {
         lateinit var database: AppDatabase
     }
-    val retrofitServices = Common.retrofitService
+    // Код с активити карт _____________________________________________
+    private lateinit var mapView: MapView
+    private lateinit var map: Map
+    private lateinit var locationManager: LocationManager
+    private val PERMISSIONS_REQUEST_FINE_LOCATION = 1
+
+    private val drivingRouteListener = object : DrivingSession.DrivingRouteListener {
+        override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
+            routes = drivingRoutes
+        }
+
+        override fun onDrivingRoutesError(error: Error) {
+            val errorMessage = when (error) {
+                is NetworkError -> "Routes request error due to network issues"
+                else -> "Routes request unknown error"
+            }
+            showToast(errorMessage)
+        }
+    }
+
+    private var routePoints = emptyList<Point>()
+        set(value) {
+            field = value
+            onRoutePointsUpdated()
+        }
+
+    private var routes = emptyList<DrivingRoute>()
+        set(value) {
+            field = value
+            onRoutesUpdated()
+        }
+
+    private lateinit var drivingRouter: DrivingRouter
+    private var drivingSession: DrivingSession? = null
+    private lateinit var placemarksCollection: MapObjectCollection
+    private lateinit var routesCollection: MapObjectCollection
+
+    //_____________________________________________
+
+    private lateinit var binding: ActivityMainBinding
+
     private var searches: Boolean = false
     private var slidingUpPanelStartAnchor: Float = 0.5F
     private var slidingUpPanelDepartmentInfoAnchor: Float = 0F //считается на OnCreate
@@ -76,8 +138,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private val adapter = DepartmentHistoryAdapter(this)
     private val adapterFavorite = DepartmentFavoriteAdapter(this)
     private val adapterSearched = DepartmentSearchedAdapter(this)
-    private val adapterChat = ChatAdapter(this, this)
-    private val citiesAdapter = CitiesAdapter(this)
 
     private lateinit var slidingUpLayout : SlidingUpPanelLayout
 
@@ -92,7 +152,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var searchedRecycleViewWhenSearch: RecyclerView
     private lateinit var filterButtonWhenSearch: ImageButton
 
-    private lateinit var mainIncludedLayout: ViewGroup
     private lateinit var departmentInfoIncludedLayout: ViewGroup
 
     private lateinit var customScrollView: CustomScrollView
@@ -135,109 +194,27 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     private lateinit var routeIncludedLayout: ViewGroup
     private lateinit var cancelConstantTextView: TextView
-//    private lateinit var addressFromEditText: EditText
+    //    private lateinit var addressFromEditText: EditText
     private lateinit var addressToEditText: EditText
     private lateinit var cancelRouteImageButton: ImageButton
     private lateinit var goButton: ImageButton
 
-//    private lateinit var callAssistantButton: Button
-    private lateinit var assistantCancelImageButton: ImageButton
-    private lateinit var sendToAssistantImageButton: ImageButton
-    private lateinit var assistantIncludedLayout: ViewGroup
-    private lateinit var assistantEditText: EditText
-
-    private lateinit var chatRecyclerView: RecyclerView
     private lateinit var editRouteImageButton: ImageButton
     private lateinit var changeRouteIncludedLayout: ViewGroup
     private lateinit var cancelChangeRouteTextView: TextView
     private lateinit var addressToChangeRouteEditText: EditText
 
-    private lateinit var driven: DrawerLayout
-    private lateinit var navigation_view: NavigationView
 
-    private lateinit var scrollView: CustomScrollView
 
-//
-//    private val departmentList = listOf(
-//        DepartmentForHistory("Отделение ВТБ", "11-я Московская"),
-//        DepartmentForHistory("Банк ВТБ", "3-я Дачная"),
-//    )//TODO: динамическое заполнение
-//    private val departmentFavoiriteList = listOf(
-//        DepartmentFavorite("ВТБ", "1-я Ленинская"),
-//    )//TODO: динамическое заполнение
-//    private val departmentSearchList = listOf(
-//        Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
-//        Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
-//        Department("ВТБ", "2-я Троцкая", 11, 5, "+79956241379", "Круглосуточно"),
-//        )//TODO: динамическое заполнение
-    private val citiesSearchList = listOf(
-        City("Москва"),
-        City("Саратов"),
-        City("Краснодар"),
-        City("Самара"),
-        City("Санкт-Петербург"),
-        )//TODO: динамическое заполнение
-
-    // Код для карт _____________________________________________
-    private lateinit var mapView: MapView
-    private lateinit var map: Map
-    private lateinit var locationManager: LocationManager
-    private val PERMISSIONS_REQUEST_FINE_LOCATION = 1
-
-    private val inputListener = object : InputListener {
-        override fun onMapTap(map: Map, point: Point) = Unit
-
-        override fun onMapLongTap(map: Map, point: Point) {
-            routePoints = routePoints + point
-        }
-    }
-
-    private val drivingRouteListener = object : DrivingSession.DrivingRouteListener {
-        override fun onDrivingRoutes(drivingRoutes: MutableList<DrivingRoute>) {
-            routes = drivingRoutes
-        }
-
-        override fun onDrivingRoutesError(error: Error) {
-            val errorMessage = when (error) {
-                is NetworkError -> "Routes request error due to network issues"
-                else -> "Routes request unknown error"
-            }
-            Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private var routePoints = emptyList<Point>()
-        set(value) {
-            field = value
-            onRoutePointsUpdated()
-        }
-
-    private var routes = emptyList<DrivingRoute>()
-        set(value) {
-            field = value
-            onRoutesUpdated()
-        }
-
-    private lateinit var drivingRouter: DrivingRouter
-    private var drivingSession: DrivingSession? = null
-    private lateinit var placemarksCollection: MapObjectCollection
-    private lateinit var routesCollection: MapObjectCollection
-    private lateinit var listOfCitiesIncludedLayout: ViewGroup
-    private lateinit var clearSearchCityImageView: ImageView
-    private lateinit var searchedCityRecycleView: RecyclerView
-
-    //_____________________________________________
-
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         database = Room.databaseBuilder(
             this,
             AppDatabase::class.java,
             "my_database"
         ).build()
-        MapKitFactory.setApiKey("1d2e8d46-8a93-4908-9d08-55f914630072")
-        MapKitFactory.initialize(this)
-
         setContentView(R.layout.activity_main)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -247,6 +224,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         initAdapters()
         initOther()
 
+        // код с активити с карт_____________________________________________
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         // Проверяем разрешение на доступ к местоположению
@@ -258,16 +236,34 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             requestLocationPermission()
         }
 
+        // Инициализируем MapKit и DirectionsFactory
+        MapKitFactory.initialize(this)
+        DirectionsFactory.initialize(this)
+
+        // Устанавливаем макет активности
+//        setContentView(R.layout.activity_layout)
+
+        // Находим MapView и его Map
         mapView = findViewById(R.id.mapview)
         map = mapView.mapWindow.map
-        map.addInputListener(inputListener)
 
+        // Отображаем версию MapKit
+        val mapkitVersionView = findViewById<LinearLayout>(R.id.mapkit_version)
+        val mapkitVersionTextView = mapkitVersionView.findViewById<TextView>(CommonId.mapkit_version_value)
+        mapkitVersionTextView.text = MapKitFactory.getInstance().version
+        mapView.visibility = View.VISIBLE
         // Создаем коллекции для маркеров и маршрутов на карте
         placemarksCollection = map.mapObjects.addCollection()
         routesCollection = map.mapObjects.addCollection()
 
         // Инициализируем DrivingRouter для построения маршрутов
         drivingRouter = DirectionsFactory.getInstance().createDrivingRouter()
+
+        // Назначаем обработчик кнопки для очистки маршрута
+        findViewById<Button>(R.id.button_clear_route).setOnClickListener {
+            routePoints = emptyList()
+        }
+        //_____________________________________________
 
     }
 
@@ -285,7 +281,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 )
             }
 
-            call?.enqueue(object : Callback<LocalityDto> {
+            call?.enqueue(object : Callback<LocalityDto>{
                 override fun onResponse(call: Call<LocalityDto>, response: Response<LocalityDto>) {
                     if (response.isSuccessful) {
                         departmentSearchList = response.body()?.departmentDtoList?: mutableListOf()
@@ -341,26 +337,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             includedLayout.favouritesRecycleView.adapter = adapterFavorite
             adapterFavorite.addDepartmentAll(departmentFavoriteList)
             includedLayout.favouritesRecycleView.isNestedScrollingEnabled = false
-
-            chatRecyclerView = findViewById(R.id.chatRecyclerView)
-            chatRecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
-            chatRecyclerView.adapter = adapterChat
-            chatRecyclerView.isNestedScrollingEnabled = false
-
-            searchedCityRecycleView = findViewById(R.id.searchedCityRecycleView)
-            searchedCityRecycleView.layoutManager = LinearLayoutManager(this@MainActivity)
-            searchedCityRecycleView.adapter = citiesAdapter
-            citiesAdapter.addCityAll(citiesSearchList)
-            searchedCityRecycleView.isNestedScrollingEnabled = false
-
-            Log.i("city", citiesAdapter.cityList.toString())
-
-//            val layoutParams: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
-//                ConstraintLayout.LayoutParams.WRAP_CONTENT, // Ширина кнопки
-//                ConstraintLayout.LayoutParams.WRAP_CONTENT  // Высота кнопки
-//            )
-//            layoutParams.topToBottom = R.id.includedLayout
-//            //TODO: кнопки над SlidingUpPanel
         }
     }
 
@@ -383,7 +359,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         return result
     }
 
-    fun getDay(department: DepartmentDto,dayOfWeek: DayOfWeek):String{
+    fun getDay(department: DepartmentDto,dayOfWeek:DayOfWeek):String{
         when (dayOfWeek) {
             DayOfWeek.MONDAY -> return department.workDaysFizDto?.day1.toString()
             DayOfWeek.TUESDAY -> return department.workDaysFizDto?.day2.toString()
@@ -401,7 +377,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         val displayMetrics = resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
         val screenHeight = displayMetrics.heightPixels
-        Log.e("Размеры экрана", "screenWidth = $screenWidth, screenHeight = $screenHeight")
+        Log.e("Размеры экрана ", "screenWidth = $screenWidth, screenHeight = $screenHeight")
 
         val res = resources
         val pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) * 2 + res.getDimension(R.dimen.marginTop) * 3).toInt()
@@ -413,6 +389,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         slidingUpLayout.addPanelSlideListener(object : SlidingUpPanelLayout.PanelSlideListener {
 
             override fun onPanelSlide(panel: View, slideOffset: Float) {
+//              //TODO: неполное развёртывание
                 Log.i("Slide", "onPanelSlide, offset $slideOffset")
             }
 
@@ -421,7 +398,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 previousState: SlidingUpPanelLayout.PanelState?,
                 newState: SlidingUpPanelLayout.PanelState
             ) {
-                if(newState.equals(SlidingUpPanelLayout.PanelState.EXPANDED)) {
+                if(newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     customScrollView.setScrollingEnabled(true)
                     Log.i("Раскрыто", "панель раскрыта, теперь customScrollView.isEnabled = ${customScrollView.isEnabled} \n" +
                             "и slidingUpLayout.isTouchEnabled = ${slidingUpLayout.isTouchEnabled}")
@@ -436,15 +413,15 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun initOther(){
         val displayMetrics = resources.displayMetrics
         appWidthPixels = displayMetrics.widthPixels
         appHeightPixels = displayMetrics.heightPixels
 
-        mainIncludedLayout = findViewById(R.id.includedLayout)
         findViewById<ImageView>(R.id.lineImageView).setOnClickListener{
             if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.ANCHORED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
-        else slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
+            else slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
 
         val res = resources
         var pixelValue = (res.getDimension(R.dimen.departmentInfoPictureHeight) + res.getDimension(R.dimen.departmentInfoTitleMarginTop)
@@ -465,7 +442,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
         slidingUpPanelDepartmentInfoAnchor = pixelValue.toFloat()/appHeightPixels
 
-        Log.e("slidingUpPanelDepartmentInfoAnchor", "$slidingUpPanelDepartmentInfoAnchor")
+        Log.e("slidingUpPanelDepAnchor", "$slidingUpPanelDepartmentInfoAnchor")
 
         pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) * 2
                 ).toInt()
@@ -503,6 +480,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         })
 
         var text: String
+        //Список из поиска
         addressToEditText.addTextChangedListener {
             if(slidingUpLayout.anchorPoint == slidingUpPanelRouteAnchor) slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
             if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.EXPANDED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
@@ -540,7 +518,10 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         addressFromEditText.addTextChangedListener {
             if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.EXPANDED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
         }
-
+        moreButton.setOnClickListener {
+            Log.e("RcView", "нажат на ${slidingUpLayout.panelState}")
+            //TODO: выдвижение настроек
+        }
         departmentInfoIncludedLayout = findViewById(R.id.departmentInfoIncludedLayout)
 
         departmentInfoReklamaImageView = findViewById(R.id.departmentInfoReklamaImageView)
@@ -572,43 +553,18 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         loadConstTextView = findViewById(R.id.loadConstTextView)
         loadDataTextView = findViewById(R.id.loadDataTextView)
 
-//        callAssistantButton = findViewById(R.id.callAssistantButton)
-        assistantIncludedLayout = findViewById(R.id.assistantIncludedLayout)
-        assistantCancelImageButton = findViewById(R.id.assistantCancelImageButton)
-        sendToAssistantImageButton = findViewById(R.id.sendToAssistantImageButton)
-        assistantEditText = findViewById(R.id.assistantEditText)
-
         routeIncludedLayout = findViewById(R.id.routeIncludedLayout)
         cancelConstantTextView = findViewById(R.id.cancelConstantTextView)
         cancelRouteImageButton = findViewById(R.id.cancelRouteImageButton)
         goButton = findViewById(R.id.goButton)
         editRouteImageButton = findViewById(R.id.editRouteImageButton)
 
-        cancelDepartmentInfoImageButton.setOnClickListener {
-            setMainLayout()
-        }
+        cancelDepartmentInfoImageButton.setOnClickListener { setMainLayout() }
         cancelRouteImageButton.setOnClickListener {
             routeIncludedLayout.visibility = View.GONE
             setDepartmentLayout()
         }
         routeImageButton.setOnClickListener { setRoute() }
-
-//        callAssistantButton.setOnClickListener { setAssistantLayout() }
-        assistantCancelImageButton.setOnClickListener {
-            assistantIncludedLayout.visibility = View.GONE
-            mainIncludedLayout.visibility = View.VISIBLE
-            setMainLayout()
-            adapterChat.clearList()
-            assistantEditText.setText("")
-        }
-        sendToAssistantImageButton.setOnClickListener {
-            val text = assistantEditText.text.toString()
-            if(text != ""){
-                adapterChat.addChatItem(ChatMessage(text))
-
-                adapterChat.addChatItem(ChatMessage("Привет", false))
-            }
-        }
         editRouteImageButton.setOnClickListener { setChangeRouteLayout() }
         changeRouteIncludedLayout = findViewById(R.id.changeRouteIncludedLayout)
         addressToChangeRouteEditText = findViewById(R.id.addressToChangeRouteEditText)
@@ -625,53 +581,10 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 setRoute()
             }
         }
-
-        driven = findViewById(R.id.driven)
-        listOfCitiesIncludedLayout = findViewById(R.id.listOfCitiesIncludedLayout)
-        clearSearchCityImageView = findViewById(R.id.clearSearchCityImageView)
-
-        var oldHeight = slidingUpLayout.panelHeight
-        moreButton.setOnClickListener{
-            oldHeight = slidingUpLayout.panelHeight
-            val layoutParams: ViewGroup.LayoutParams = navigation_view.getLayoutParams()
-            layoutParams.height = appHeightPixels
-            navigation_view.setLayoutParams(layoutParams)
-            slidingUpLayout.panelHeight = 0
-            slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-
-            driven.openDrawer(GravityCompat.END)
-        }
-        navigation_view = findViewById(R.id.navigation_view)
-        navigation_view.setNavigationItemSelectedListener {
-            when(it.itemId){
-                R.id.listOfCitiesItem -> {
-                    setCitiesLayout()
-                }
-                R.id.settingsItem -> {
-                    Toast.makeText(this, "Настройки в разработке", Toast.LENGTH_SHORT).show()
-                }
-            }
-            slidingUpLayout.panelHeight = oldHeight
-            slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
-            driven.closeDrawer(GravityCompat.END)
-            true
-        }
-        scrollView = findViewById(R.id.scrollView)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        MapKitFactory.getInstance().onStart()
-        mapView.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        MapKitFactory.getInstance().onStop()
-        mapView.onStop()
     }
 
     override fun onClickItem(department: RecentlyDepartmentWithDepartment) {
+        //Депортаменты из истории, переход в депортамент
         Log.e("RcView", "нажат на $department")
         departmentNameTextView.text = department.department.description
         addressDataTextView.text = department.department.address
@@ -680,10 +593,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     override fun onClickDeleteItem(department: RecentlyDepartmentWithDepartment) {
+        //Удаление
         adapter.deleteDepartment(department)
     }
 
     override fun onClickItem(department: FavoriteDepartmentWithDepartment) {
+        //Депортаменты из избранного, переход в депортамент
         Log.e("RcView", "нажат на $department")
         departmentNameTextView.text = department.departmentEntity.description
         addressDataTextView.text = department.departmentEntity.address
@@ -692,6 +607,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     override fun onClickDeleteItem(department: FavoriteDepartmentWithDepartment) {
+        //Delete
         adapterFavorite.deleteDepartment(department)
     }
 
@@ -707,13 +623,99 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         //TODO: подставка
     }
 
-    override fun onClickItem(city: City) {
-
-    }
-
     override fun onClickDeleteItem(department: SearchDepartment) {
         TODO("Not yet implemented")
     }
+
+    private fun setDepartmentLayout(){
+        addressFromEditText.visibility = View.INVISIBLE
+        addressToEditText.visibility = View.INVISIBLE
+
+        filterButtonWhenSearch.visibility = View.INVISIBLE
+        searchedRecycleViewWhenSearch.visibility = View.GONE
+
+        moreButton.visibility = View.INVISIBLE
+        filterButton.visibility = View.INVISIBLE
+        reklamaImageView.visibility = View.INVISIBLE
+        recentlySearchedTextView.visibility = View.INVISIBLE
+        recentlySearchedRecycleView.visibility = View.GONE
+        favouritesTextView.visibility = View.INVISIBLE
+        favouritesRecycleView.visibility = View.GONE
+
+        departmentInfoIncludedLayout.visibility = View.VISIBLE
+
+        // параметры для высоты и ширины
+        val layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+            appHeightPixels // Высота в пикселях или другой единице измерения
+        )
+        departmentInfoIncludedLayout.layoutParams = layoutParams
+        slidingUpLayout.panelHeight = departmentInfoSlidingUpPanelHeight
+        slidingUpLayout.anchorPoint = slidingUpPanelDepartmentInfoAnchor
+    }
+
+    private fun setMainLayout(){
+        departmentInfoIncludedLayout.visibility = View.GONE
+        addressFromEditText.visibility = View.VISIBLE
+        addressToEditText.visibility = View.VISIBLE
+        moreButton.visibility = View.VISIBLE
+        filterButton.visibility = View.VISIBLE
+        if(searches){
+            filterButtonWhenSearch.visibility = View.VISIBLE
+            searchedRecycleViewWhenSearch.visibility = View.VISIBLE
+        }
+        else{
+            moreButton.visibility = View.VISIBLE
+            filterButton.visibility = View.VISIBLE
+            reklamaImageView.visibility = View.VISIBLE
+            recentlySearchedTextView.visibility = View.VISIBLE
+            recentlySearchedRecycleView.visibility = View.VISIBLE
+            favouritesTextView.visibility = View.VISIBLE
+            favouritesRecycleView.visibility = View.VISIBLE
+        }
+
+        slidingUpLayout.panelHeight = startSlidingUpPanelHeight
+        slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
+
+        Log.e("Anchor", "${slidingUpLayout.anchorPoint}")
+        Log.e("Anchor", "${slidingUpLayout.panelHeight}")
+    }
+
+    private fun setRoute(){
+        departmentInfoIncludedLayout.visibility = View.GONE
+        routeIncludedLayout.visibility = View.VISIBLE
+//        callAssistantButton.visibility = View.GONE
+//        departmentInfoIncludedLayout.visibility = View.GONE
+//        addressFromEditText.visibility = View.VISIBLE
+//        addressToEditText.visibility = View.VISIBLE
+//        moreButton.visibility = View.VISIBLE
+//        filterButton.visibility = View.VISIBLE
+//
+//        addressToEditText.setText(departmentNameTextView.text)
+//        searchedRecycleViewWhenSearch.visibility = View.INVISIBLE
+//        searches = false
+//
+//        // параметры для высоты и ширины
+//        val layoutParams = ConstraintLayout.LayoutParams(
+//            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+//            appHeightPixels // Высота в пикселях или другой единице измерения
+//        )
+//        routeIncludedLayout.layoutParams = layoutParams
+//
+        slidingUpLayout.panelHeight = routeSlidingUpPanelHeight
+        slidingUpLayout.anchorPoint = slidingUpPanelRouteAnchor
+//
+//        Log.e("Anchoe", "${slidingUpLayout.anchorPoint}")
+//        Log.e("Anchoe", "${slidingUpLayout.panelHeight}")
+    }
+
+    private fun setChangeRouteLayout(){
+        routeIncludedLayout.visibility = View.GONE
+        changeRouteIncludedLayout.visibility = View.VISIBLE
+        addressFromEditText.visibility = View.VISIBLE
+    }
+
+    // код с активити карт _____________________________________________
 
     private fun checkLocationPermission() =
         ActivityCompat.checkSelfPermission(
@@ -774,7 +776,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         // Запросите обновления местоположения пользователя
         if (checkLocationPermission()) {
             locationManager.requestLocationUpdates(
-                LocationManager.NETWORK_PROVIDER, // Изменили на NETWORK_PROVIDER
+                LocationManager.FUSED_PROVIDER, // Изменили на NETWORK_PROVIDER
                 0,
                 0f,
                 locationListener
@@ -796,6 +798,18 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         onRoutePointsUpdated()
     }
 
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+        mapView.onStart()
+    }
+
+    override fun onStop() {
+        mapView.onStop()
+        MapKitFactory.getInstance().onStop()
+        super.onStop()
+    }
+
     private fun onRoutePointsUpdated() {
         placemarksCollection.clear()
 
@@ -805,7 +819,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             return
         }
 
-        val imageProvider = ImageProvider.fromResource(this, R.drawable.marker_png_48_ico)
+        val imageProvider = ImageProvider.fromResource(this, R.drawable.bullet)
         routePoints.forEach {
             placemarksCollection.addPlacemark(
                 it,
@@ -851,136 +865,136 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     private fun PolylineMapObject.styleMainRoute() {
         zIndex = 10f
-        setStrokeColor(R.color.primaryElementsColor)
-//        setStrokeColor(ContextCompat.getColor(this@MainActivity, CommonColors.gray))
+        setStrokeColor(ContextCompat.getColor(this@MainActivity, CommonColors.gray))
         strokeWidth = 5f
-        outlineColor = (R.color.black)
-//        ContextCompat.getColor(this@MainActivity, CommonColors.black)
+        outlineColor = ContextCompat.getColor(this@MainActivity, CommonColors.black)
         outlineWidth = 3f
     }
 
     private fun PolylineMapObject.styleAlternativeRoute() {
         zIndex = 5f
-//        setStrokeColor(ContextCompat.getColor(this@MainActivity, CommonColors.light_blue))
-        setStrokeColor(R.color.secondaryElementsColor)
+        setStrokeColor(ContextCompat.getColor(this@MainActivity, CommonColors.light_blue))
         strokeWidth = 4f
-        outlineColor = (R.color.black)
-//        ContextCompat.getColor(this@MainActivity, CommonColors.black)
+        outlineColor = ContextCompat.getColor(this@MainActivity, CommonColors.black)
         outlineWidth = 2f
     }
+    //_____________________________________________
+    // Запросы к серверу
+    val retrofitServices = com.yandex.mapkitdemo.routing.common.Common.retrofitService
 
-    private fun setCitiesLayout(){
-        val layoutParams = ConstraintLayout.LayoutParams(
-            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
-            appHeightPixels // Высота в пикселях или другой единице измерения
-        )
-        listOfCitiesIncludedLayout.layoutParams = layoutParams
-        listOfCitiesIncludedLayout.visibility = View.VISIBLE
+    private fun getWorkDays(){
+        val call = retrofitServices.getWorkDays()
+
+        call.enqueue(object : Callback<ArrayList<WorkDaysDto>> {
+            override fun onResponse(call: Call<ArrayList<WorkDaysDto>>, response: Response<ArrayList<WorkDaysDto>>) {
+                if (response.isSuccessful) {
+                    val workDays = response.body()
+                    Log.e("Отделения банков",workDays.toString())
+                } else {
+                    Log.e("Ошибка данных","Ошибка при получении данных с сервера")
+                }
+            }
+
+            override fun onFailure(call: Call<ArrayList<WorkDaysDto>>, t: Throwable) {
+                Log.e("Ошибка подключегия","Ошибка при получении данных с сервера")
+            }
+        })
+    }
+    private fun getStates(){
+        val call = retrofitServices.getStates()
+
+        call.enqueue(object : Callback<ArrayList<StateDto>>{
+            override fun onResponse(call: Call<ArrayList<StateDto>>, response: Response<ArrayList<StateDto>>) {
+                if (response.isSuccessful) {
+                    val departments = response.body()
+                    Log.e("Отделения банков",departments.toString())
+                } else {
+                    Log.e("Ошибка данных","Ошибка при получении данных с сервера")
+                }
+            }
+
+            override fun onFailure(call: Call<ArrayList<StateDto>>, t: Throwable) {
+                Log.e("Ошибка подключегия","Ошибка при получении данных с сервера")
+            }
+        })
+    }
+    private fun getLocalities(){
+        val call = retrofitServices.getLocalities()
+
+        call.enqueue(object : Callback<ArrayList<LocalityDto>>{
+            override fun onResponse(call: Call<ArrayList<LocalityDto>>, response: Response<ArrayList<LocalityDto>>) {
+                if (response.isSuccessful) {
+                    val departments = response.body()
+                    Log.e("Отделения банков",departments.toString())
+                } else {
+                    Log.e("Ошибка данных","Ошибка при получении данных с сервера")
+                }
+            }
+
+            override fun onFailure(call: Call<ArrayList<LocalityDto>>, t: Throwable) {
+                Log.e("Ошибка подключегия",t.message.toString())
+            }
+        })
     }
 
-    private fun setDepartmentLayout(){
-//        callAssistantButton.visibility = View.GONE
-        addressFromEditText.visibility = View.INVISIBLE
-        addressToEditText.visibility = View.INVISIBLE
+    private fun getDays(){
+        val call = retrofitServices.getDays()
 
-        filterButtonWhenSearch.visibility = View.INVISIBLE
-        searchedRecycleViewWhenSearch.visibility = View.GONE
+        call.enqueue(object : Callback<ArrayList<DayDto>> {
+            override fun onResponse(call: Call<ArrayList<DayDto>>, response: Response<ArrayList<DayDto>>) {
+                if (response.isSuccessful) {
+                    val departments = response.body()
+                    Log.e("Отделения банков",departments.toString())
+                } else {
+                    Log.e("Ошибка данных","Ошибка при получении данных с сервера")
+                }
+            }
 
-        moreButton.visibility = View.INVISIBLE
-        filterButton.visibility = View.INVISIBLE
-        reklamaImageView.visibility = View.INVISIBLE
-        recentlySearchedTextView.visibility = View.INVISIBLE
-        recentlySearchedRecycleView.visibility = View.GONE
-        favouritesTextView.visibility = View.INVISIBLE
-        favouritesRecycleView.visibility = View.GONE
-
-        departmentInfoIncludedLayout.visibility = View.VISIBLE
-
-        // параметры для высоты и ширины
-        val layoutParams = ConstraintLayout.LayoutParams(
-            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
-            appHeightPixels // Высота в пикселях или другой единице измерения
-        )
-        departmentInfoIncludedLayout.layoutParams = layoutParams
-        slidingUpLayout.panelHeight = departmentInfoSlidingUpPanelHeight
-        slidingUpLayout.anchorPoint = slidingUpPanelDepartmentInfoAnchor
-
-        Log.e("Anchoe", "${slidingUpLayout.anchorPoint}")
-        Log.e("Anchoe", "${slidingUpLayout.panelHeight}")
+            override fun onFailure(call: Call<ArrayList<DayDto>>, t: Throwable) {
+                Log.e("Ошибка подключегия","Ошибка при получении данных с сервера")
+            }
+        })
     }
+    private fun getCountries(){
+        val call = retrofitServices.getCountries()
 
-    //TODO: Добавить анимацию кнопки
+        call.enqueue(object : Callback<ArrayList<CountryDto>> {
+            override fun onResponse(call: Call<ArrayList<CountryDto>>, response: Response<ArrayList<CountryDto>>) {
+                if (response.isSuccessful) {
+                    val departments = response.body()
+                    Log.e("Отделения банков",departments.toString())
+                } else {
+                    Log.e("Ошибка данных","Ошибка при получении данных с сервера")
+                }
+            }
 
-    private fun setMainLayout(){
-        departmentInfoIncludedLayout.visibility = View.GONE
-//        callAssistantButton.visibility = View.VISIBLE
-        addressFromEditText.visibility = View.VISIBLE
-        addressToEditText.visibility = View.VISIBLE
-        moreButton.visibility = View.VISIBLE
-        filterButton.visibility = View.VISIBLE
-        if(searches){
-            filterButtonWhenSearch.visibility = View.VISIBLE
-            searchedRecycleViewWhenSearch.visibility = View.VISIBLE
-        }
-        else{
-            moreButton.visibility = View.VISIBLE
-            filterButton.visibility = View.VISIBLE
-            reklamaImageView.visibility = View.VISIBLE
-            recentlySearchedTextView.visibility = View.VISIBLE
-            recentlySearchedRecycleView.visibility = View.VISIBLE
-            favouritesTextView.visibility = View.VISIBLE
-            favouritesRecycleView.visibility = View.VISIBLE
-        }
-
-        slidingUpLayout.panelHeight = startSlidingUpPanelHeight
-        slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
-
-        Log.e("Anchor", "${slidingUpLayout.anchorPoint}")
-        Log.e("Anchor", "${slidingUpLayout.panelHeight}")
+            override fun onFailure(call: Call<ArrayList<CountryDto>>, t: Throwable) {
+                Log.e("Ошибка подключегия","Ошибка при получении данных с сервера")
+            }
+        })
     }
+    private fun writeMessage() {
+        val chatId = "123"
+        val message = "Привет, как дела?"
 
-    private fun setRoute(){
-        departmentInfoIncludedLayout.visibility = View.GONE
-        routeIncludedLayout.visibility = View.VISIBLE
-//        callAssistantButton.visibility = View.GONE
-//        departmentInfoIncludedLayout.visibility = View.GONE
-//        addressFromEditText.visibility = View.VISIBLE
-//        addressToEditText.visibility = View.VISIBLE
-//        moreButton.visibility = View.VISIBLE
-//        filterButton.visibility = View.VISIBLE
-//
-//        addressToEditText.setText(departmentNameTextView.text)
-//        searchedRecycleViewWhenSearch.visibility = View.INVISIBLE
-//        searches = false
-//
-//        // параметры для высоты и ширины
-//        val layoutParams = ConstraintLayout.LayoutParams(
-//            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
-//            appHeightPixels // Высота в пикселях или другой единице измерения
-//        )
-//        routeIncludedLayout.layoutParams = layoutParams
-//
-        slidingUpLayout.panelHeight = routeSlidingUpPanelHeight
-        slidingUpLayout.anchorPoint = slidingUpPanelRouteAnchor
-//
-//        Log.e("Anchoe", "${slidingUpLayout.anchorPoint}")
-//        Log.e("Anchoe", "${slidingUpLayout.panelHeight}")
-    }
+        val call = retrofitServices.writeMessage(chatId, message)
 
-    private fun setChangeRouteLayout(){
-        routeIncludedLayout.visibility = View.GONE
-        changeRouteIncludedLayout.visibility = View.VISIBLE
-        addressFromEditText.visibility = View.VISIBLE
-    }
+        call.enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    // Обработка успешного ответа
+                    println("Успешный ответ: $responseBody")
+                } else {
+                    // Обработка неуспешного ответа
+                    println("Неуспешный ответ: ${response.errorBody()}")
+                }
+            }
 
-    private fun setAssistantLayout(){
-        mainIncludedLayout.visibility = View.GONE
-
-        val layoutParams = ConstraintLayout.LayoutParams(
-            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
-            appHeightPixels // Высота в пикселях или другой единице измерения
-        )
-        assistantIncludedLayout.layoutParams = layoutParams
-        assistantIncludedLayout.visibility = View.VISIBLE
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                // Обработка ошибки
+                println("Ошибка: ${t.message}")
+            }
+        })
     }
 }
