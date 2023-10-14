@@ -30,6 +30,8 @@ import com.example.vtbapiapp.common.Common
 import com.example.vtbapiapp.database.AppDatabase
 import com.example.vtbapiapp.database.dtos.DepartmentDto
 import com.example.vtbapiapp.database.dtos.LocalityDto
+import com.example.vtbapiapp.database.entitys.DepartmentEntity
+import com.example.vtbapiapp.database.entitys.FavoritesEntity
 import com.example.vtbapiapp.database.entitys.withEntity.FavoriteDepartmentWithDepartment
 import com.example.vtbapiapp.database.entitys.withEntity.RecentlyDepartmentWithDepartment
 import com.example.vtbapiapp.databinding.ActivityMainBinding
