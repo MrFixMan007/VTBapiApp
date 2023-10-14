@@ -2,7 +2,6 @@ package com.example.vtbapiapp.`interface`
 
 
 import com.example.vtbapiapp.database.dtos.CountryDto
-import com.example.vtbapiapp.database.dtos.DayDto
 import com.example.vtbapiapp.database.dtos.DepartmentDto
 import com.example.vtbapiapp.database.dtos.LocalityDto
 import com.example.vtbapiapp.database.dtos.StateDto
@@ -27,12 +26,12 @@ interface RetrofitServices {
     fun getLocalities():Call<ArrayList<LocalityDto>>
     @GET("locality/getLocalityById")
     fun getLocalityById(@Query("id")id:Long):Call<LocalityDto>
+    @GET("locality/findLocalityByName")
+    fun findLocalityByName(@Query("name")name:String):Call<LocalityDto>
 
     @GET("department/getWorkloadOfDepartment")
     fun getWorkloadOfDepartment(@Query("id")id:Long):Call<Map<Long,Int>>
 
-    @GET("days/getDays")
-    fun getDays():Call<ArrayList<DayDto>>
 
     @GET("country/getCountries")
     fun getCountries():Call<ArrayList<CountryDto>>

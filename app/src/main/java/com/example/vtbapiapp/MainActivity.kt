@@ -3,6 +3,7 @@ package com.example.vtbapiapp
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -29,6 +30,8 @@ import com.example.vtbapiapp.common.Common
 import com.example.vtbapiapp.database.AppDatabase
 import com.example.vtbapiapp.database.dtos.DepartmentDto
 import com.example.vtbapiapp.database.dtos.LocalityDto
+import com.example.vtbapiapp.database.entitys.LocalityEntity
+import com.example.vtbapiapp.database.entitys.MyLocality
 import com.example.vtbapiapp.database.entitys.withEntity.FavoriteDepartmentWithDepartment
 import com.example.vtbapiapp.database.entitys.withEntity.RecentlyDepartmentWithDepartment
 import com.example.vtbapiapp.databinding.ActivityMainBinding
@@ -51,6 +54,11 @@ import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.mapkit.search.SearchFactory
+import com.yandex.mapkit.search.SearchManagerType
+import com.yandex.mapkit.search.SearchOptions
+import com.yandex.mapkit.search.SearchType
+import com.yandex.mapkit.search.Session.SearchListener
 import com.yandex.mapkitdemo.routing.DepartmentSearchedAdapter
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
@@ -61,6 +69,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.util.Locale
 
 
 class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, DepartmentFavoriteAdapter.Listener, DepartmentSearchedAdapter.Listener, ChatAdapter.Listener, CitiesAdapter.Listener {
@@ -361,6 +370,9 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                     if (response.isSuccessful) {
                         localityNames  = response.body()?: mapOf<Long, String>()
                         citiesAdapter.addCityAll(localityNames.map { Locality(it.key,it.value) })
+                        citiesAdapter.addCityAll(localityNames.map { Locality(it.key,it.value) })
+                        citiesAdapter.addCityAll(localityNames.map { Locality(it.key,it.value) })
+                        citiesAdapter.addCityAll(localityNames.map { Locality(it.key,it.value) })
                         Log.e("Locality","$localityNames")
                     } else {
                         Log.e("Locality","Ошибка запроса")
@@ -428,15 +440,14 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     fun getDay(department: DepartmentDto,dayOfWeek: DayOfWeek):String{
         when (dayOfWeek) {
-            DayOfWeek.MONDAY -> return department.workDaysFizDto?.day1.toString()
-            DayOfWeek.TUESDAY -> return department.workDaysFizDto?.day2.toString()
-            DayOfWeek.WEDNESDAY -> return department.workDaysFizDto?.day3.toString()
-            DayOfWeek.THURSDAY -> return department.workDaysFizDto?.day4.toString()
-            DayOfWeek.FRIDAY -> return department.workDaysFizDto?.day5.toString()
-            DayOfWeek.SATURDAY -> return department.workDaysFizDto?.day6.toString()
-            DayOfWeek.SUNDAY -> return department.workDaysFizDto?.day7.toString()
+            DayOfWeek.MONDAY -> return "${department.workDaysFizDto?.mon_s} - ${department.workDaysFizDto?.mon_f}"
+            DayOfWeek.TUESDAY -> return "${department.workDaysFizDto?.tue_s} - ${department.workDaysFizDto?.tue_f}"
+            DayOfWeek.WEDNESDAY -> return "${department.workDaysFizDto?.wed_s} - ${department.workDaysFizDto?.wed_f}"
+            DayOfWeek.THURSDAY -> return "${department.workDaysFizDto?.thu_s} - ${department.workDaysFizDto?.thu_f}"
+            DayOfWeek.FRIDAY -> return "${department.workDaysFizDto?.fri_s} - ${department.workDaysFizDto?.fri_f}"
+            DayOfWeek.SATURDAY -> return "${department.workDaysFizDto?.sat_s} - ${department.workDaysFizDto?.sat_f}"
+            DayOfWeek.SUNDAY -> return "${department.workDaysFizDto?.sun_s} - ${department.workDaysFizDto?.sun_f}"
         }
-
     }
     private fun initSlidingUpPanel(){
         slidingUpLayout = findViewById(R.id.slidingUpLayout)
@@ -751,6 +762,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
 
     override fun onClickItem(locality: Locality) {
+        runBlocking {database.myLocalityDAO().insertMyLocality(MyLocality(localityId = locality.id))}
 
     }
 
@@ -795,6 +807,32 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 // Получите координаты пользователя
                 val userLocation = Point(location.latitude, location.longitude)
                 // Здесь вы можете выполнить другие действия с новыми координатами пользователя.
+                val geocoder = Geocoder(this@MainActivity, Locale.getDefault())
+                val addresses = geocoder.getFromLocation(location.latitude, location.longitude,1)
+
+                if (addresses != null) {
+                    if (addresses.isNotEmpty()) {
+                        val city = addresses[0]?.locality
+                        val call = retrofitServices.findLocalityByName(city.toString())
+                        call.enqueue(object : Callback<LocalityDto>{
+                            override fun onResponse(call: Call<LocalityDto>,
+                                                    response: Response<LocalityDto>) {
+                                if (response.isSuccessful) {
+                                    val result = response.body()
+                                    val currentDayOfWeek = LocalDate.now().dayOfWeek
+                                    adapterSearched.addDepartmentAll(result?.departmentDtoList!!.map { SearchDepartment(it,"",(getWorkLoad(it)?: mutableMapOf()).toString(),getDay(it,currentDayOfWeek)) })
+                                } else {
+
+                                }
+                            }
+                            override fun onFailure(call: Call<LocalityDto>, t: Throwable) {
+                                Log.e("Ошибка подключения", t.message.toString())
+                            }
+                        })
+                        Log.e("Location",city.toString())
+                    }
+                }
+
 
                 // Установите START_POSITION на текущие координаты
                 val updatedStartPosition = CameraPosition(userLocation, 13.0f, 0f, 0f)

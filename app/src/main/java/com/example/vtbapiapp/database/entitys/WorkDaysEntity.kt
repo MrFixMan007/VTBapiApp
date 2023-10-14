@@ -10,19 +10,19 @@ data class WorkDaysEntity(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
     val workDaysId: Long,  // Переименовано поле для избежания конфликта имен
-    val mon_s: Time? = null,
-    val mon_f: Time? = null,
-    val tue_s: Time? = null,
-    val tue_f: Time? = null,
-    val wed_s: Time? = null,
-    val wed_f: Time? = null,
-    val thu_s: Time? = null,
-    val thu_f: Time? = null,
-    val fri_s: Time? = null,
-    val fri_f: Time? = null,
-    val sat_s: Time? = null,
-    val sat_f: Time? = null,
-    val sun_s: Time? = null,
-    val sun_f: Time? = null
+    val mon_s: Time,
+    val mon_f: Time,
+    val tue_s: Time,
+    val tue_f: Time,
+    val wed_s: Time,
+    val wed_f: Time,
+    val thu_s: Time,
+    val thu_f: Time,
+    val fri_s: Time,
+    val fri_f: Time,
+    val sat_s: Time,
+    val sat_f: Time,
+    val sun_s: Time,
+    val sun_f: Time
 )
 

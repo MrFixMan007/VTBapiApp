@@ -1,23 +1,22 @@
 package com.example.vtbapiapp.database.dtos
 
-import com.example.vtbapiapp.database.dtos.DayDto
-import com.google.gson.annotations.SerializedName
+import java.sql.Time
+
 data class WorkDaysDto (
-    @SerializedName("id")
     val id: Long,
-    @SerializedName("day1")
-    val day1: DayDto? = null,
-    @SerializedName("day2")
-    val day2: DayDto? = null,
-    @SerializedName("day3")
-    val day3: DayDto? = null,
-    @SerializedName("day4")
-    val day4: DayDto? = null,
-    @SerializedName("day5")
-    val day5: DayDto? = null,
-    @SerializedName("day6")
-    val day6: DayDto? = null,
-    @SerializedName("day7")
-    val day7: DayDto? = null
+    val mon_s: Time,
+    val mon_f: Time,
+    val tue_s: Time,
+    val tue_f: Time,
+    val wed_s: Time,
+    val wed_f: Time,
+    val thu_s: Time,
+    val thu_f: Time,
+    val fri_s: Time,
+    val fri_f: Time,
+    val sat_s: Time,
+    val sat_f: Time,
+    val sun_s: Time,
+    val sun_f: Time
 )
 

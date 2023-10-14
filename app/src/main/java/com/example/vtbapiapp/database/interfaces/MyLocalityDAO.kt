@@ -12,10 +12,10 @@ import com.example.vtbapiapp.database.entitys.withEntity.MyLocalityWithLocality
 
 @Dao
 interface MyLocalityDAO {
-    @Insert
-    suspend fun insertMyLocality(localityEntity: LocalityEntity)
+//    @Insert
+//    suspend fun insertMyLocality(localityEntity: LocalityEntity)
     @Delete
-    suspend fun deleteMyLocality(localityEntity: LocalityEntity)
+    suspend fun deleteMyLocality(localityEntity: MyLocality)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMyLocality(myLocality: MyLocality)
     @Transaction

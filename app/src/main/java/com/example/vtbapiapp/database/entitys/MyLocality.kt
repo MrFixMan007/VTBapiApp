@@ -8,9 +8,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class MyLocality (
     @PrimaryKey
-    val id:Long,
+    val id:Long = 0,
     @ColumnInfo(name = "locality_id")
     val localityId:Long,
-    @Embedded
-    val point: Point
 )

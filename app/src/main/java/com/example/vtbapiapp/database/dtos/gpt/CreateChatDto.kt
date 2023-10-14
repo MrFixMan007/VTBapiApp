@@ -1,3 +1,7 @@
 package com.example.vtbapiapp.database.dtos.gpt
 
-data class CreateChatDto (val user_id:String)
+import com.google.gson.annotations.SerializedName
+
+data class CreateChatDto (
+    @SerializedName("user_id")
+    val user_id:String)

@@ -1,3 +1,7 @@
 package com.example.vtbapiapp.database.dtos.gpt
 
-data class DeleteChatDto (val chat_id:String)
+import com.google.gson.annotations.SerializedName
+
+data class DeleteChatDto (
+    @SerializedName("chat_id")
+    val chat_id:String)

@@ -1,27 +1,28 @@
 package com.example.vtbapiapp.database.entitys
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class AvailabilityEntity (
+data class AvailabilityEntity(
     @PrimaryKey
     val id:Long,
-    @ColumnInfo(name = "wheelchair_id")
-    val wheelchairId:Long,
-    @ColumnInfo(name = "blind_id")
-    val blindId:Long,
-    @ColumnInfo(name = "nfc_for_bank_cards_id")
-    val nfcForBankCardsId:Long,
-    @ColumnInfo(name = "qr_read_id")
-    val qrReadId:Long,
-    @ColumnInfo(name = "supports_usd_id")
-    val supportsUsdId:Long,
-    @ColumnInfo(name = "supports_charge_rub_id")
-    val supportsChargeRubId:Long,
-    @ColumnInfo(name = "support_eur_id")
-    val supportEurId:Long,
-    @ColumnInfo(name = "support_rub_id")
-    val supportRubId:Long,
+    val wheelchair_cap: Boolean,
+    val wheelchair_act: Boolean,
+    val blind_cap: Boolean,
+    val blind_act: Boolean,
+    val nfc_for_bank_cards_cap: Boolean,
+    val nfc_for_bank_cards_act: Boolean,
+    val qr_read_cap: Boolean,
+    val qr_read_act: Boolean,
+    val supports_usd_cap: Boolean,
+    val supports_usd_act: Boolean,
+    val supports_charge_rub_cap: Boolean,
+    val supports_charge_rub_act: Boolean,
+    val supports_eur_cap: Boolean,
+    val supports_eur_act: Boolean,
+    val supports_rub_cap: Boolean,
+    val supports_rub_act: Boolean,
+    val rub_large_bills: Boolean,
+    val rub_small_bills: Boolean,
 )
