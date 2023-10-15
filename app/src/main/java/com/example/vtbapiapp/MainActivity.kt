@@ -883,21 +883,24 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         departmentNameTextView.text = department.departmentEntity.description
         addressDataTextView.text = department.departmentEntity.address
         val currentDayOfWeek = LocalDate.now().dayOfWeek
+        val workDays = runBlocking { database.departmentDAO().getDepartmentAndWorkDaysById(department.departmentEntity.id) }
         val time = when (currentDayOfWeek) {
-            DayOfWeek.MONDAY ->  "${department.departmentEntity.workDaysFizId?.mon_s} - ${department.workDaysFizDto?.mon_f}"
-            DayOfWeek.TUESDAY ->  "${department.departmentEntity.workDaysFizId?.tue_s} - ${department.workDaysFizDto?.tue_f}"
-            DayOfWeek.WEDNESDAY ->  "${department.departmentEntity.workDaysFizId?.wed_s} - ${department.workDaysFizDto?.wed_f}"
-            DayOfWeek.THURSDAY ->  "${department.workDaysFizDto?.thu_s} - ${department.workDaysFizDto?.thu_f}"
-            DayOfWeek.FRIDAY ->  "${department.workDaysFizDto?.fri_s} - ${department.workDaysFizDto?.fri_f}"
-            DayOfWeek.SATURDAY ->  "${department.workDaysFizDto?.sat_s} - ${department.workDaysFizDto?.sat_f}"
-            DayOfWeek.SUNDAY ->  "${department.workDaysFizDto?.sun_s} - ${department.workDaysFizDto?.sun_f}"
+            DayOfWeek.MONDAY ->  "${workDays.workDaysFiz.mon_s} - ${workDays.workDaysFiz.mon_f}"
+            DayOfWeek.TUESDAY ->  "${workDays.workDaysFiz.tue_s} - ${workDays.workDaysFiz.tue_f}"
+            DayOfWeek.WEDNESDAY ->  "${workDays.workDaysFiz.wed_s} - ${workDays.workDaysFiz.wed_f}"
+            DayOfWeek.THURSDAY ->  "${workDays.workDaysFiz.thu_s} - ${workDays.workDaysFiz.thu_f}"
+            DayOfWeek.FRIDAY ->  "${workDays.workDaysFiz.fri_s} - ${workDays.workDaysFiz.fri_f}"
+            DayOfWeek.SATURDAY ->  "${workDays.workDaysFiz.sat_s} - ${workDays.workDaysFiz.sat_f}"
+            DayOfWeek.SUNDAY ->  "${workDays.workDaysFiz.sun_s} - ${workDays.workDaysFiz.sun_f}"
         }
-
         workTimesDataTextView.text = time
+        contactsDataTextView.text = department.departmentEntity.phone
+        countsOfCommentsTextView.text = "2,5 тыс. отзывов"
+        loadDataTextView.text = "25%"
+
         setDepartmentLayout()
         //TODO: подставка
     }
-
     override fun onClickDeleteItem(department: FavoriteDepartmentWithDepartment) {
         runBlocking { database.favoriteDepartmentDAO().deleteFavorite(department.favoritesEntity) }
         adapterFavorite.deleteDepartment(department)

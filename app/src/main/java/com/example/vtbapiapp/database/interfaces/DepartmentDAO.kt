@@ -25,5 +25,5 @@ interface DepartmentDAO {
 
     @Transaction
     @Query("SELECT * FROM department where id = :id")
-     suspend fun getDepartmentAndWorkDaysById(id:String): DepartmentWithWorkDays
+     suspend fun getDepartmentAndWorkDaysById(id:Long?): DepartmentWithWorkDays
 }

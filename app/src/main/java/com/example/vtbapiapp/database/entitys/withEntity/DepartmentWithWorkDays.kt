@@ -11,5 +11,10 @@ data class DepartmentWithWorkDays(
         parentColumn = "work_days_ur_id",
         entityColumn = "id"
     )
-    val workDays: WorkDaysEntity
+    val workDaysUr: WorkDaysEntity,
+    @Relation(
+        parentColumn = "work_days_fiz_id",
+        entityColumn = "id"
+    )
+    val workDaysFiz: WorkDaysEntity
 )
