@@ -118,6 +118,30 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private var appWidthPixels = 0
 
     private lateinit var departmentInfoReklamaImageView: ImageView
+    private  val chatId: String = runBlocking {
+        var res:String = ""
+        val call = retrofitServices.createChat()
+        call.enqueue(object : Callback<String>{
+        override fun onResponse(call: Call<String>, response: Response<String>) {
+            if (response.isSuccessful) {
+                res = response.body()?:""
+
+                Log.e("chat", res)
+            }
+
+            else {
+                res = ""
+                Log.e("chat", "Данные")
+            }
+        }
+        override fun onFailure(call: Call<String>, t: Throwable) {
+            res = ""
+            Log.e("Ошибка подключения", t.message.toString())
+        }
+
+    })
+        return@runBlocking res
+    }
     private lateinit var departmentNameTextView:TextView
     private lateinit var cancelDepartmentInfoImageButton: ImageButton
     private lateinit var starImageView1: ImageView
@@ -681,9 +705,28 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         sendToAssistantImageButton.setOnClickListener {
             val text = assistantEditText.text.toString()
             if(text != ""){
-                adapterChat.addChatItem(ChatMessage(text))
+                val call = retrofitServices.writeMessage(chatId, ChatMessage(text).text)
+                call.enqueue(object : Callback<String> {
+                    override fun onResponse(call: Call<String>, response: Response<String>) {
+                        if (response.isSuccessful) {
+                            val result = response.body() ?: ""
+                            adapterChat.addChatItem(ChatMessage(text))
+                            adapterChat.addChatItem(ChatMessage(result, false))
+                            Log.e("chat", result)
+                        } else {
+                            adapterChat.addChatItem(ChatMessage(text))
+                            adapterChat.addChatItem(ChatMessage("Ошибка", false))
+                        }
+                    }
 
-                adapterChat.addChatItem(ChatMessage("Привет", false))
+                    override fun onFailure(call: Call<String>, t: Throwable) {
+                        adapterChat.addChatItem(ChatMessage(text))
+                        Log.e("chat", t.toString())
+                    }
+                })
+
+
+
             }
         }
         editRouteImageButton.setOnClickListener { setChangeRouteLayout() }
@@ -733,6 +776,10 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             when(it.itemId){
                 R.id.listOfCitiesItem -> {
                     callChatImageButton.visibility = View.INVISIBLE
+
+                    val call = retrofitServices.createChat()
+
+
                     setCitiesLayout()
                 }
                 R.id.settingsItem -> {

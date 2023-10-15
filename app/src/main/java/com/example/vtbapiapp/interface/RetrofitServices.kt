@@ -33,14 +33,18 @@ interface RetrofitServices {
     fun getWorkloadOfDepartment(@Query("id")id:Long):Call<Map<Long,Int>>
 
 
+    @POST("gpt/createChat")
+    fun createChat():Call<String>
+
+
     @GET("country/getCountries")
     fun getCountries():Call<ArrayList<CountryDto>>
 
     @GET("gpt/writeMessage")
     fun writeMessage(
-        @Query("chatId") chatId:String,
-        @Query("message") message:String
-    ):Call<String>
+        @Query("chatId") chatId: String,
+        @Query("message") message: String
+    ): Call<String>
 
 
 
