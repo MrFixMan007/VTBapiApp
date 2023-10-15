@@ -757,7 +757,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         addressDataTextView.text = department.departmentDto.address
 //        loadDataTextView.text = department.load.toString()
 //        contactsDataTextView.text = department.phone
-//        workTimesDataTextView.text = department.workTime
+//        workTimesDataTextView.text = department.workTime//
         setDepartmentLayout()
         Log.e("RcView", "нажат на $department")
         //TODO: подставка
