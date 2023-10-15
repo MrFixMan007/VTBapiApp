@@ -823,7 +823,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                                     val result = response.body()
                                     val currentDayOfWeek = LocalDate.now().dayOfWeek
                                     adapterSearched.addDepartmentAll(result?.departmentDtoList!!.map { SearchDepartment(it,"",(getWorkLoad(it)?: mutableMapOf()).toString(),getDay(it,currentDayOfWeek)) })
-                                } else {
+                                Log.e("LocalName",result.toString())
+                                }
+
+
+                                else {
 
                                 }
                             }

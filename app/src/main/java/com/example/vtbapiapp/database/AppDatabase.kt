@@ -27,7 +27,7 @@ import com.example.vtbapiapp.database.interfaces.WorkDaysDAO
 @Database(entities = [CountryEntity::class, DepartmentEntity::class, LocalityEntity::class,
     StateEntity::class, WorkDaysEntity::class, FavoritesEntity::class, RecentlyDepartment::class,
                      MyLocality::class, AtmEntity::class, PartEntity::class, AvailabilityEntity::class,
-    WorkloadEntity::class], exportSchema = false,version = 4)
+    WorkloadEntity::class], exportSchema = false,version = 5)
 @TypeConverters(Converters::class)
 abstract  class AppDatabase : RoomDatabase(){
     abstract fun countryDao(): CountryDAO

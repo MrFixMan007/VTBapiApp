@@ -5,13 +5,13 @@ import java.sql.Time
 
 class Converters() {
     @TypeConverter
-    fun fromTime(time: Time): Long {
-        return time.time
+    fun fromTime(time: Time): String {
+        return time.time.toString()
     }
 
     @TypeConverter
-    fun toTime(timestamp: Long): Time {
-        return Time(timestamp)
+    fun toTime(timestamp: String): Time {
+        return Time.valueOf(timestamp)
     }
 
 //    @TypeConverter
