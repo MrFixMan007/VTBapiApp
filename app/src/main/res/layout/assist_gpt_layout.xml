@@ -30,8 +30,9 @@
         android:id="@+id/chatRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginTop"
-        app:layout_constraintTop_toBottomOf="@+id/assistantCancelImageButton" />
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="@dimen/marginTop"
+        app:layout_constraintBottom_toTopOf="@+id/assistantEditText" />
 
     <EditText
         android:id="@+id/assistantEditText"

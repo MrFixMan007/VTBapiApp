@@ -3,7 +3,6 @@ package com.example.vtbapiapp
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -30,6 +29,8 @@ import com.example.vtbapiapp.common.Common
 import com.example.vtbapiapp.database.AppDatabase
 import com.example.vtbapiapp.database.dtos.DepartmentDto
 import com.example.vtbapiapp.database.dtos.LocalityDto
+import com.example.vtbapiapp.database.entitys.DepartmentEntity
+import com.example.vtbapiapp.database.entitys.FavoritesEntity
 import com.example.vtbapiapp.database.entitys.LocalityEntity
 import com.example.vtbapiapp.database.entitys.MyLocality
 import com.example.vtbapiapp.database.entitys.withEntity.FavoriteDepartmentWithDepartment
@@ -95,6 +96,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var moreButton: ImageButton
     private lateinit var filterButton: ImageButton
     private lateinit var reklamaImageView: ImageView
+    private lateinit var reklamaImageView2: ImageView
     private lateinit var recentlySearchedTextView: TextView
     private lateinit var recentlySearchedRecycleView: RecyclerView
     private lateinit var favouritesTextView: TextView
@@ -166,6 +168,10 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var navigation_view: NavigationView
 
     private lateinit var scrollView: CustomScrollView
+    private lateinit var clearSearchAddressToImageView: ImageView
+
+    private lateinit var callChatImageButton: ImageButton
+    private lateinit var showLocationImageButton: ImageButton
 
 //
 //    private val departmentList = listOf(
@@ -238,6 +244,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             AppDatabase::class.java,
             "my_database"
         ).build()
+        runBlocking {
+            database.departmentDAO().insertDepartments(DepartmentEntity(1, null, null, null, "11-я приватная", "55", "45", "450045", "", "+79576841346", "тип", "*", "avia", false, false, false ))
+            database.favoriteDepartmentDAO().insertFavorite(FavoritesEntity(1,1))
+        }
+
         MapKitFactory.setApiKey("1d2e8d46-8a93-4908-9d08-55f914630072")
         MapKitFactory.initialize(this)
 
@@ -448,6 +459,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             DayOfWeek.SATURDAY -> return "${department.workDaysFizDto?.sat_s} - ${department.workDaysFizDto?.sat_f}"
             DayOfWeek.SUNDAY -> return "${department.workDaysFizDto?.sun_s} - ${department.workDaysFizDto?.sun_f}"
         }
+
     }
     private fun initSlidingUpPanel(){
         slidingUpLayout = findViewById(R.id.slidingUpLayout)
@@ -537,6 +549,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         moreButton = findViewById(R.id.moreButton)
         filterButton = findViewById(R.id.filterButton)
         reklamaImageView = findViewById(R.id.reklamaImageView)
+        reklamaImageView2 = findViewById(R.id.reklamaImageView2)
         recentlySearchedTextView = findViewById(R.id.recentlySearchedTextView)
         recentlySearchedRecycleView = findViewById(R.id.recentlySearchedRecycleView)
         favouritesTextView = findViewById(R.id.favouritesTextView)
@@ -557,12 +570,14 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         })
 
         var text: String
+
         addressToEditText.addTextChangedListener {
             if(slidingUpLayout.anchorPoint == slidingUpPanelRouteAnchor) slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
             if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.EXPANDED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
             text = addressToEditText.text.toString()
             if (text == "" && searches){
                 searches = false
+                clearSearchAddressToImageView.visibility = View.INVISIBLE
 
                 filterButtonWhenSearch.visibility = View.GONE
                 searchedRecycleViewWhenSearch.visibility = View.GONE
@@ -570,6 +585,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 moreButton.visibility = View.VISIBLE
                 filterButton.visibility = View.VISIBLE
                 reklamaImageView.visibility = View.VISIBLE
+                reklamaImageView2.visibility = View.VISIBLE
                 recentlySearchedTextView.visibility = View.VISIBLE
                 recentlySearchedRecycleView.visibility = View.VISIBLE
                 favouritesTextView.visibility = View.VISIBLE
@@ -578,6 +594,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             }
             else if (text != "" && !searches){
                 searches = true
+                clearSearchAddressToImageView.visibility = View.VISIBLE
+
                 filterButtonWhenSearch.visibility = View.VISIBLE
                 searchedRecycleViewWhenSearch.visibility = View.VISIBLE
 //                callAssistantButton.visibility = View.GONE
@@ -585,6 +603,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 moreButton.visibility = View.INVISIBLE
                 filterButton.visibility = View.GONE
                 reklamaImageView.visibility = View.GONE
+                reklamaImageView2.visibility = View.GONE
+                clearSearchAddressToImageView.visibility = View.VISIBLE
                 recentlySearchedTextView.visibility = View.GONE
                 recentlySearchedRecycleView.visibility = View.GONE
                 favouritesTextView.visibility = View.GONE
@@ -654,6 +674,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             setMainLayout()
             adapterChat.clearList()
             assistantEditText.setText("")
+            clearSearchAddressToImageView.visibility = View.INVISIBLE
+            slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
         }
         sendToAssistantImageButton.setOnClickListener {
             val text = assistantEditText.text.toString()
@@ -681,6 +703,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         }
 
         driven = findViewById(R.id.driven)
+        driven.addDrawerListener(object : DrawerLayout.SimpleDrawerListener(){
+            override fun onDrawerClosed(drawerView: View) {
+                super.onDrawerClosed(drawerView)
+                slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
+            }
+        })
         listOfCitiesIncludedLayout = findViewById(R.id.listOfCitiesIncludedLayout)
         clearSearchCityImageView = findViewById(R.id.clearSearchCityImageView)
 
@@ -695,14 +723,20 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
             driven.openDrawer(GravityCompat.END)
         }
+        clearSearchCityImageView.setOnClickListener{
+            listOfCitiesIncludedLayout.visibility = View.INVISIBLE
+            setMainLayout()
+        }
         navigation_view = findViewById(R.id.navigation_view)
         navigation_view.setNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.listOfCitiesItem -> {
+                    callChatImageButton.visibility = View.INVISIBLE
                     setCitiesLayout()
                 }
                 R.id.settingsItem -> {
                     Toast.makeText(this, "Настройки в разработке", Toast.LENGTH_SHORT).show()
+                    callChatImageButton.visibility = View.VISIBLE
                 }
             }
             slidingUpLayout.panelHeight = oldHeight
@@ -711,6 +745,23 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             true
         }
         scrollView = findViewById(R.id.scrollView)
+        clearSearchAddressToImageView = findViewById(R.id.clearSearchAddressToImageView)
+
+        clearSearchAddressToImageView.setOnClickListener{
+            addressToEditText.setText("")
+        }
+
+        callChatImageButton = findViewById(R.id.callChatImageButton)
+        callChatImageButton.setOnClickListener{
+            setAssistantLayout()
+        }
+        showLocationImageButton = findViewById(R.id.showLocationImageButton)
+        showLocationImageButton.setOnClickListener{
+            if (checkLocationPermission()) {
+                // Если разрешение есть, запрашиваем местоположение пользователя
+                requestLocation()
+            }
+        }
     }
 
     override fun onStart() {
@@ -976,6 +1027,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         moreButton.visibility = View.INVISIBLE
         filterButton.visibility = View.INVISIBLE
         reklamaImageView.visibility = View.INVISIBLE
+        reklamaImageView2.visibility = View.INVISIBLE
+        clearSearchAddressToImageView.visibility = View.INVISIBLE
         recentlySearchedTextView.visibility = View.INVISIBLE
         recentlySearchedRecycleView.visibility = View.GONE
         favouritesTextView.visibility = View.INVISIBLE
@@ -1005,6 +1058,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         addressToEditText.visibility = View.VISIBLE
         moreButton.visibility = View.VISIBLE
         filterButton.visibility = View.VISIBLE
+        clearSearchAddressToImageView.visibility = View.VISIBLE
         if(searches){
             filterButtonWhenSearch.visibility = View.VISIBLE
             searchedRecycleViewWhenSearch.visibility = View.VISIBLE
@@ -1013,6 +1067,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             moreButton.visibility = View.VISIBLE
             filterButton.visibility = View.VISIBLE
             reklamaImageView.visibility = View.VISIBLE
+            reklamaImageView2.visibility = View.VISIBLE
             recentlySearchedTextView.visibility = View.VISIBLE
             recentlySearchedRecycleView.visibility = View.VISIBLE
             favouritesTextView.visibility = View.VISIBLE
@@ -1069,5 +1124,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         )
         assistantIncludedLayout.layoutParams = layoutParams
         assistantIncludedLayout.visibility = View.VISIBLE
+        slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
     }
 }

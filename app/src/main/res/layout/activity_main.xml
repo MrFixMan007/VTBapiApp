@@ -17,13 +17,68 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/driven"
-        tools:openDrawer="end"
         >
 
         <com.yandex.mapkit.mapview.MapView
             android:id="@+id/mapview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ImageButton
+                android:layout_width="@dimen/heightOfSearchEditText"
+                android:layout_height="@dimen/heightOfSearchEditText"
+                sothree:layout_constraintTop_toTopOf="parent"
+                sothree:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/callChatImageButton"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="60dp"
+                android:src="@drawable/chat_gpt_ico"
+                android:background="@drawable/rounded_action_button"
+                android:backgroundTint="@color/specialActionElementsColor"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                sothree:layout_constraintTop_toTopOf="parent"
+                sothree:layout_constraintBottom_toBottomOf="parent"
+                sothree:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginRight="20dp"
+                >
+                <ImageButton
+                    android:layout_width="@dimen/heightOfSearchEditText"
+                    android:layout_height="@dimen/heightOfSearchEditText"
+                    android:background="@drawable/rounded_button"
+                    android:src="@drawable/sum_ico">
+                </ImageButton>
+
+                <ImageButton
+                    android:layout_marginTop="20dp"
+                    android:layout_width="@dimen/heightOfSearchEditText"
+                    android:layout_height="@dimen/heightOfSearchEditText"
+                    android:background="@drawable/rounded_button"
+                    android:src="@drawable/sub_ico">
+                </ImageButton>
+            </LinearLayout>
+
+            <ImageButton
+                android:layout_width="@dimen/heightOfSearchEditText"
+                android:layout_height="@dimen/heightOfSearchEditText"
+                sothree:layout_constraintBottom_toBottomOf="parent"
+                sothree:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/showLocationImageButton"
+                android:layout_marginRight="20dp"
+                android:src="@drawable/my_position_ico"
+                android:background="@drawable/rounded_action_button"
+                android:backgroundTint="@color/specialActionElementsColor"
+                android:layout_marginBottom="10dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigation_view"
