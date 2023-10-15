@@ -151,12 +151,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
     private lateinit var routeIncludedLayout: ViewGroup
     private lateinit var cancelConstantTextView: TextView
-//    private lateinit var addressFromEditText: EditText
+    //    private lateinit var addressFromEditText: EditText
     private lateinit var addressToEditText: EditText
     private lateinit var cancelRouteImageButton: ImageButton
     private lateinit var goButton: ImageButton
 
-//    private lateinit var callAssistantButton: Button
+    //    private lateinit var callAssistantButton: Button
     private lateinit var assistantCancelImageButton: ImageButton
     private lateinit var sendToAssistantImageButton: ImageButton
     private lateinit var assistantIncludedLayout: ViewGroup
@@ -239,6 +239,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var clearSearchCityImageView: ImageView
     private lateinit var searchedCityRecycleView: RecyclerView
 
+    private lateinit var addressToTextView: TextView
+
     //_____________________________________________
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -251,8 +253,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         runBlocking {
             database.workDaysDAO().insertWorkDays(WorkDaysEntity(1, "9", "20","9", "20","9", "20","9", "20","9", "20","9", "20","9", "20"))
             database.workDaysDAO().insertWorkDays(WorkDaysEntity(2, "Круглосуточно", "Круглосуточно", "Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно"))
-            database.departmentDAO().insertDepartments(DepartmentEntity(1, null, 1, 1, "Политехническая улица, 65/1", "55", "45", "450045", "", "+79576841346", "тип", "*", "avia", false, false, false ))
-            database.departmentDAO().insertDepartments(DepartmentEntity(2, null, 2, 2, "Беговая улица, 2а к1, 1 этаж", "55", "45", "450045", "", "+79576841346", "тип", "*", "avia", false, false, false ))
+            database.departmentDAO().insertDepartments(DepartmentEntity(1, null, 1, 1, "Политехническая улица, 65/1", "55", "45", "450045", "Отделение ВТБ", "+79576841346", "тип", "*", "avia", false, false, false ))
+            database.departmentDAO().insertDepartments(DepartmentEntity(2, null, 2, 2, "Привокзальная пл., 1", "55", "45", "450045", "Банкомат ВТБ", "+79576841346", "тип", "*", "avia", false, false, false ))
             database.favoriteDepartmentDAO().insertFavorite(FavoritesEntity(1,1))
             database.favoriteDepartmentDAO().insertFavorite(FavoritesEntity(2,2))
         }
@@ -271,14 +273,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        // Проверяем разрешение на доступ к местоположению
-        if (checkLocationPermission()) {
-            // Если разрешение есть, запрашиваем местоположение пользователя
-            requestLocation()
-        } else {
-            // Если разрешение отсутствует, запрашиваем его
-            requestLocationPermission()
-        }
+
 
         mapView = findViewById(R.id.mapview)
         map = mapView.mapWindow.map
@@ -551,7 +546,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         mainIncludedLayout = findViewById(R.id.includedLayout)
         findViewById<ImageView>(R.id.lineImageView).setOnClickListener{
             if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.ANCHORED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
-        else slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
+            else slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED }
 
         val res = resources
         var pixelValue = (res.getDimension(R.dimen.departmentInfoPictureHeight) + res.getDimension(R.dimen.departmentInfoTitleMarginTop)
@@ -702,11 +697,30 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         cancelDepartmentInfoImageButton.setOnClickListener {
             setMainLayout()
         }
+        goButton.setOnClickListener {
+            slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+            // Проверяем разрешение на доступ к местоположению
+            if (checkLocationPermission()) {
+                // Если разрешение есть, запрашиваем местоположение пользователя
+                requestLocation()
+            } else {
+                // Если разрешение отсутствует, запрашиваем его
+                requestLocationPermission()
+            }
+
+        }
+
         cancelRouteImageButton.setOnClickListener {
             routeIncludedLayout.visibility = View.GONE
             setDepartmentLayout()
+            routes = mutableListOf()
+            onRoutesUpdated()
+            routePoints = mutableListOf()
+            onRoutePointsUpdated()
         }
-        routeImageButton.setOnClickListener { setRoute() }
+        routeImageButton.setOnClickListener {
+            setRoute()
+        }
 
 //        callAssistantButton.setOnClickListener { setAssistantLayout() }
         assistantCancelImageButton.setOnClickListener {
@@ -802,8 +816,10 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             if (checkLocationPermission()) {
                 // Если разрешение есть, запрашиваем местоположение пользователя
                 requestLocation()
+
             }
         }
+        addressToTextView = findViewById(R.id.addressToTextView)
     }
 
     override fun onStart() {
@@ -836,17 +852,21 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         departmentNameTextView.text = department.departmentEntity.description
         addressDataTextView.text = department.departmentEntity.address
         val currentDayOfWeek = LocalDate.now().dayOfWeek
+        val workDays = runBlocking { database.departmentDAO().getDepartmentAndWorkDaysById(department.departmentEntity.id) }
         val time = when (currentDayOfWeek) {
-            DayOfWeek.MONDAY ->  "${department.departmentEntity.workDaysFizId?.mon_s} - ${department.workDaysFizDto?.mon_f}"
-            DayOfWeek.TUESDAY ->  "${department.departmentEntity.workDaysFizId?.tue_s} - ${department.workDaysFizDto?.tue_f}"
-            DayOfWeek.WEDNESDAY ->  "${department.departmentEntity.workDaysFizId?.wed_s} - ${department.workDaysFizDto?.wed_f}"
-            DayOfWeek.THURSDAY ->  "${department.workDaysFizDto?.thu_s} - ${department.workDaysFizDto?.thu_f}"
-            DayOfWeek.FRIDAY ->  "${department.workDaysFizDto?.fri_s} - ${department.workDaysFizDto?.fri_f}"
-            DayOfWeek.SATURDAY ->  "${department.workDaysFizDto?.sat_s} - ${department.workDaysFizDto?.sat_f}"
-            DayOfWeek.SUNDAY ->  "${department.workDaysFizDto?.sun_s} - ${department.workDaysFizDto?.sun_f}"
+            DayOfWeek.MONDAY ->  "${workDays.workDaysFiz.mon_s} - ${workDays.workDaysFiz.mon_f}"
+            DayOfWeek.TUESDAY ->  "${workDays.workDaysFiz.tue_s} - ${workDays.workDaysFiz.tue_f}"
+            DayOfWeek.WEDNESDAY ->  "${workDays.workDaysFiz.wed_s} - ${workDays.workDaysFiz.wed_f}"
+            DayOfWeek.THURSDAY ->  "${workDays.workDaysFiz.thu_s} - ${workDays.workDaysFiz.thu_f}"
+            DayOfWeek.FRIDAY ->  "${workDays.workDaysFiz.fri_s} - ${workDays.workDaysFiz.fri_f}"
+            DayOfWeek.SATURDAY ->  "${workDays.workDaysFiz.sat_s} - ${workDays.workDaysFiz.sat_f}"
+            DayOfWeek.SUNDAY ->  "${workDays.workDaysFiz.sun_s} - ${workDays.workDaysFiz.sun_f}"
         }
-
         workTimesDataTextView.text = time
+        contactsDataTextView.text = department.departmentEntity.phone
+        countsOfCommentsTextView.text = "2,5 тыс. отзывов"
+        loadDataTextView.text = "25%"
+
         setDepartmentLayout()
         //TODO: подставка
     }
@@ -928,7 +948,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                                     val result = response.body()
                                     val currentDayOfWeek = LocalDate.now().dayOfWeek
                                     adapterSearched.addDepartmentAll(result?.departmentDtoList!!.map { SearchDepartment(it,"",(getWorkLoad(it)?: mutableMapOf()).toString(),getDay(it,currentDayOfWeek)) })
-                                Log.e("LocalName",result.toString())
+                                    Log.e("LocalName",result.toString())
                                 }
 
 
@@ -979,7 +999,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private fun requestRoute(userLocation: Point, startPosition: CameraPosition) {
         val DEFAULT_POINTS = listOf(
             userLocation,
-            Point(51.529153, 45.976746),
+            Point(51.54281, 45.99825),
         )
 
         routePoints = DEFAULT_POINTS
@@ -1138,6 +1158,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private fun setRoute(){
         departmentInfoIncludedLayout.visibility = View.GONE
         routeIncludedLayout.visibility = View.VISIBLE
+        addressToTextView.text = "Отделение ВТБ"
 //        callAssistantButton.visibility = View.GONE
 //        departmentInfoIncludedLayout.visibility = View.GONE
 //        addressFromEditText.visibility = View.VISIBLE
@@ -1158,6 +1179,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 //
         slidingUpLayout.panelHeight = routeSlidingUpPanelHeight
         slidingUpLayout.anchorPoint = slidingUpPanelRouteAnchor
+        slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
 //
 //        Log.e("Anchoe", "${slidingUpLayout.anchorPoint}")
 //        Log.e("Anchoe", "${slidingUpLayout.panelHeight}")
