@@ -71,7 +71,7 @@
                 android:layout_height="@dimen/heightOfSearchEditText"
                 sothree:layout_constraintBottom_toBottomOf="parent"
                 sothree:layout_constraintEnd_toEndOf="parent"
-                android:id="@+id/ImageButton"
+                android:id="@+id/showLocationImageButton"
                 android:layout_marginRight="20dp"
                 android:src="@drawable/my_position_ico"
                 android:background="@drawable/rounded_action_button"

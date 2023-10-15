@@ -163,6 +163,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     private lateinit var clearSearchAddressToImageView: ImageView
 
     private lateinit var callChatImageButton: ImageButton
+    private lateinit var showLocationImageButton: ImageButton
 
 //
 //    private val departmentList = listOf(
@@ -235,6 +236,11 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             AppDatabase::class.java,
             "my_database"
         ).build()
+        runBlocking {
+            database.departmentDAO().insertDepartments(DepartmentEntity(1, null, null, null, "11-я приватная", "55", "45", "450045", "", "+79576841346", "тип", "*", "avia", false, false, false ))
+            database.favoriteDepartmentDAO().insertFavorite(FavoritesEntity(1,1))
+        }
+
         MapKitFactory.setApiKey("1d2e8d46-8a93-4908-9d08-55f914630072")
         MapKitFactory.initialize(this)
 
@@ -527,12 +533,14 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         })
 
         var text: String
+
         addressToEditText.addTextChangedListener {
             if(slidingUpLayout.anchorPoint == slidingUpPanelRouteAnchor) slidingUpLayout.anchorPoint = slidingUpPanelStartAnchor
             if (slidingUpLayout.panelState != SlidingUpPanelLayout.PanelState.EXPANDED) slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
             text = addressToEditText.text.toString()
             if (text == "" && searches){
                 searches = false
+                clearSearchAddressToImageView.visibility = View.INVISIBLE
 
                 filterButtonWhenSearch.visibility = View.GONE
                 searchedRecycleViewWhenSearch.visibility = View.GONE
@@ -548,6 +556,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             }
             else if (text != "" && !searches){
                 searches = true
+                clearSearchAddressToImageView.visibility = View.VISIBLE
+
                 filterButtonWhenSearch.visibility = View.VISIBLE
                 searchedRecycleViewWhenSearch.visibility = View.VISIBLE
 
@@ -623,6 +633,8 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             setMainLayout()
             adapterChat.clearList()
             assistantEditText.setText("")
+            clearSearchAddressToImageView.visibility = View.INVISIBLE
+            slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.ANCHORED
         }
         sendToAssistantImageButton.setOnClickListener {
             val text = assistantEditText.text.toString()
@@ -683,7 +695,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 }
                 R.id.settingsItem -> {
                     Toast.makeText(this, "Настройки в разработке", Toast.LENGTH_SHORT).show()
-                    callChatImageButton.visibility = View.INVISIBLE
+                    callChatImageButton.visibility = View.VISIBLE
                 }
             }
             slidingUpLayout.panelHeight = oldHeight
@@ -699,6 +711,16 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         }
 
         callChatImageButton = findViewById(R.id.callChatImageButton)
+        callChatImageButton.setOnClickListener{
+            setAssistantLayout()
+        }
+        showLocationImageButton = findViewById(R.id.showLocationImageButton)
+        showLocationImageButton.setOnClickListener{
+            if (checkLocationPermission()) {
+                // Если разрешение есть, запрашиваем местоположение пользователя
+                requestLocation()
+            }
+        }
     }
 
     override fun onStart() {
@@ -1028,5 +1050,6 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         )
         assistantIncludedLayout.layoutParams = layoutParams
         assistantIncludedLayout.visibility = View.VISIBLE
+        slidingUpLayout.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
     }
 }

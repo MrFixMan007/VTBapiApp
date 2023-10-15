@@ -43,6 +43,7 @@
         app:layout_constraintEnd_toEndOf="@+id/addressToEditText"
         android:src="@drawable/cross_small_ico"
         android:layout_marginRight="5dp"
+        android:visibility="invisible"
         />
 
     <ImageButton
