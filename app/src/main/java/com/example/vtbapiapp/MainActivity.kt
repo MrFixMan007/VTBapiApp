@@ -34,6 +34,7 @@ import com.example.vtbapiapp.database.entitys.DepartmentEntity
 import com.example.vtbapiapp.database.entitys.FavoritesEntity
 import com.example.vtbapiapp.database.entitys.LocalityEntity
 import com.example.vtbapiapp.database.entitys.MyLocality
+import com.example.vtbapiapp.database.entitys.WorkDaysEntity
 import com.example.vtbapiapp.database.entitys.withEntity.FavoriteDepartmentWithDepartment
 import com.example.vtbapiapp.database.entitys.withEntity.RecentlyDepartmentWithDepartment
 import com.example.vtbapiapp.databinding.ActivityMainBinding
@@ -54,6 +55,8 @@ import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectCollection
+import com.yandex.mapkit.map.PlacemarkCreatedCallback
+import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.SearchFactory
@@ -81,7 +84,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
     }
     val retrofitServices = Common.retrofitService
     private var searches: Boolean = false
-    private var slidingUpPanelStartAnchor: Float = 0.5F
+    private var slidingUpPanelStartAnchor: Float = 0.6F
     private var slidingUpPanelDepartmentInfoAnchor: Float = 0F //считается на OnCreate
     private var slidingUpPanelRouteAnchor: Float = 0F //считается на OnCreate
 
@@ -270,8 +273,12 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
             "my_database"
         ).build()
         runBlocking {
-            database.departmentDAO().insertDepartments(DepartmentEntity(1, null, null, null, "11-я приватная", "55", "45", "450045", "", "+79576841346", "тип", "*", "avia", false, false, false ))
+            database.workDaysDAO().insertWorkDays(WorkDaysEntity(1, "9", "20","9", "20","9", "20","9", "20","9", "20","9", "20","9", "20"))
+            database.workDaysDAO().insertWorkDays(WorkDaysEntity(2, "Круглосуточно", "Круглосуточно", "Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно","Круглосуточно", "Круглосуточно"))
+            database.departmentDAO().insertDepartments(DepartmentEntity(1, null, 1, 1, "Политехническая улица, 65/1", "55", "45", "450045", "", "+79576841346", "тип", "*", "avia", false, false, false ))
+            database.departmentDAO().insertDepartments(DepartmentEntity(2, null, 2, 2, "Беговая улица, 2а к1, 1 этаж", "55", "45", "450045", "", "+79576841346", "тип", "*", "avia", false, false, false ))
             database.favoriteDepartmentDAO().insertFavorite(FavoritesEntity(1,1))
+            database.favoriteDepartmentDAO().insertFavorite(FavoritesEntity(2,2))
         }
 
         MapKitFactory.setApiKey("1d2e8d46-8a93-4908-9d08-55f914630072")
@@ -307,6 +314,19 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
 
         // Инициализируем DrivingRouter для построения маршрутов
         drivingRouter = DirectionsFactory.getInstance().createDrivingRouter()
+
+//        map.mapObjects.addPlacemark().apply {
+//            geometry = Point(59.935493, 30.327392)
+//            setIcon(ImageProvider.fromResource(this@MainActivity, R.drawable.marker_png_48_ico_black))
+//        }
+//        map.mapObjects.addPlacemark().apply {
+//            geometry = Point(69.935493, 30.327392)
+//            setIcon(ImageProvider.fromResource(this@MainActivity, R.drawable.marker_png_48_ico_black))
+//        }
+//        map.mapObjects.addPlacemark().apply {
+//            geometry = Point(55.935493, 22.327392)
+//            setIcon(ImageProvider.fromResource(this@MainActivity, R.drawable.marker_png_48_ico_black))
+//        }TODO:map
 
     }
 
@@ -495,7 +515,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         Log.e("Размеры экрана", "screenWidth = $screenWidth, screenHeight = $screenHeight")
 
         val res = resources
-        val pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) * 2 + res.getDimension(R.dimen.marginTop) * 3).toInt()
+        val pixelValue = (res.getDimension(R.dimen.heightOfSearchEditText) + res.getDimension(R.dimen.marginTop) * 2).toInt()
         slidingUpLayout.panelHeight = pixelValue // Динамичная высота под любой экран
         startSlidingUpPanelHeight = pixelValue
 
@@ -512,12 +532,32 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 previousState: SlidingUpPanelLayout.PanelState?,
                 newState: SlidingUpPanelLayout.PanelState
             ) {
-                if(newState.equals(SlidingUpPanelLayout.PanelState.EXPANDED)) {
+                if(newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     customScrollView.setScrollingEnabled(true)
+                    val layoutParams = ConstraintLayout.LayoutParams(
+                        ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT // Высота в пикселях или другой единице измерения
+                    )
+                    departmentInfoReklamaImageView.layoutParams = layoutParams
+
                     Log.i("Раскрыто", "панель раскрыта, теперь customScrollView.isEnabled = ${customScrollView.isEnabled} \n" +
                             "и slidingUpLayout.isTouchEnabled = ${slidingUpLayout.isTouchEnabled}")
                 }
                 else {
+                    if (newState == SlidingUpPanelLayout.PanelState.ANCHORED){
+                        val layoutParams = ConstraintLayout.LayoutParams(
+                            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+                            500 // Высота в пикселях или другой единице измерения
+                        )
+                        departmentInfoReklamaImageView.layoutParams = layoutParams
+                    }
+                    else if(newState == SlidingUpPanelLayout.PanelState.COLLAPSED){
+                        val layoutParams = ConstraintLayout.LayoutParams(
+                            ConstraintLayout.LayoutParams.MATCH_PARENT,  // Ширина
+                            200 // Высота в пикселях или другой единице измерения
+                        )
+                        departmentInfoReklamaImageView.layoutParams = layoutParams
+                    }
                     customScrollView.setScrollingEnabled(false)
                     Log.i("Закрыто", "панель закрыта, теперь customScrollView.isEnabled = ${customScrollView.isEnabled} \n" +
                             "и slidingUpLayout.isTouchEnabled = ${slidingUpLayout.isTouchEnabled}")
@@ -785,6 +825,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
                 R.id.settingsItem -> {
                     Toast.makeText(this, "Настройки в разработке", Toast.LENGTH_SHORT).show()
                     callChatImageButton.visibility = View.VISIBLE
+                    clearSearchAddressToImageView.visibility = View.INVISIBLE
                 }
             }
             slidingUpLayout.panelHeight = oldHeight
@@ -841,6 +882,18 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         Log.e("RcView", "нажат на $department")
         departmentNameTextView.text = department.departmentEntity.description
         addressDataTextView.text = department.departmentEntity.address
+        val currentDayOfWeek = LocalDate.now().dayOfWeek
+        val time = when (currentDayOfWeek) {
+            DayOfWeek.MONDAY ->  "${department.departmentEntity.workDaysFizId?.mon_s} - ${department.workDaysFizDto?.mon_f}"
+            DayOfWeek.TUESDAY ->  "${department.departmentEntity.workDaysFizId?.tue_s} - ${department.workDaysFizDto?.tue_f}"
+            DayOfWeek.WEDNESDAY ->  "${department.departmentEntity.workDaysFizId?.wed_s} - ${department.workDaysFizDto?.wed_f}"
+            DayOfWeek.THURSDAY ->  "${department.workDaysFizDto?.thu_s} - ${department.workDaysFizDto?.thu_f}"
+            DayOfWeek.FRIDAY ->  "${department.workDaysFizDto?.fri_s} - ${department.workDaysFizDto?.fri_f}"
+            DayOfWeek.SATURDAY ->  "${department.workDaysFizDto?.sat_s} - ${department.workDaysFizDto?.sat_f}"
+            DayOfWeek.SUNDAY ->  "${department.workDaysFizDto?.sun_s} - ${department.workDaysFizDto?.sun_f}"
+        }
+
+        workTimesDataTextView.text = time
         setDepartmentLayout()
         //TODO: подставка
     }
@@ -1091,7 +1144,7 @@ class MainActivity : AppCompatActivity(), DepartmentHistoryAdapter.Listener, Dep
         )
         departmentInfoIncludedLayout.layoutParams = layoutParams
         slidingUpLayout.panelHeight = departmentInfoSlidingUpPanelHeight
-        slidingUpLayout.anchorPoint = slidingUpPanelDepartmentInfoAnchor
+        slidingUpLayout.anchorPoint = 0.65F
 
         Log.e("Anchoe", "${slidingUpLayout.anchorPoint}")
         Log.e("Anchoe", "${slidingUpLayout.panelHeight}")
